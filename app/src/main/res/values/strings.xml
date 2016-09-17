@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">GetFlickred</string>
+
+    <string name="error_field_empty">Cannot be empty!</string>
+    <string name="error_no_network">No network connection</string>
+
+    <string name="home_username_field_hint">Flickr Username</string>
+    <string name="home_submit_btn">SEARCH</string>
 </resources>

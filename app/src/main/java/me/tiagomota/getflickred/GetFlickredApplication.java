@@ -3,14 +3,13 @@ package me.tiagomota.getflickred;
 import android.app.Application;
 import android.content.Context;
 
-import me.tiagomota.getflickred.injection.components.ApplicationComponent;
-import me.tiagomota.getflickred.injection.components.DaggerApplicationComponent;
-import me.tiagomota.getflickred.injection.modules.ApplicationModule;
+import me.tiagomota.getflickred.ui.base.injection.components.ApplicationComponent;
+import me.tiagomota.getflickred.ui.base.injection.components.DaggerApplicationComponent;
+import me.tiagomota.getflickred.ui.base.injection.modules.ApplicationModule;
 
 public class GetFlickredApplication extends Application {
 
     private ApplicationComponent mApplicationComponent;
-
 
     /**
      * Returns the current instance of the GetFlickredApplication.
@@ -22,7 +21,11 @@ public class GetFlickredApplication extends Application {
         return (GetFlickredApplication) context.getApplicationContext();
     }
 
-
+    /**
+     * Returns an alive instance of the ApplicationComponent or returns a new one.
+     *
+     * @return ApplicationComponent
+     */
     public ApplicationComponent getComponent() {
         if (mApplicationComponent == null) {
             mApplicationComponent = DaggerApplicationComponent.builder()

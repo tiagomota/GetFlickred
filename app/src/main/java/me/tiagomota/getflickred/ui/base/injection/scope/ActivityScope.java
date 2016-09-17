@@ -1,4 +1,4 @@
-package me.tiagomota.getflickred.injection.annotations;
+package me.tiagomota.getflickred.ui.base.injection.scope;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

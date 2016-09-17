@@ -11,7 +11,7 @@ import dagger.Provides;
 import me.tiagomota.getflickred.BuildConfig;
 import me.tiagomota.getflickred.data.DataManager;
 import me.tiagomota.getflickred.data.remote.FlickrService;
-import me.tiagomota.getflickred.injection.annotations.ApplicationContext;
+import me.tiagomota.getflickred.ui.base.injection.qualifiers.ApplicationContext;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;

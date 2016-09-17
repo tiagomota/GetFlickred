@@ -1,4 +1,4 @@
-package me.tiagomota.getflickred.ui.base;
+package me.tiagomota.getflickred.ui.base.mvp;
 
 /**
  * Base interface that any class that wants to act as a View in the MVP (Model View Presenter)

@@ -9,27 +9,41 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="me.tiagomota.getflickred.ui.FlickerActivity">
+    tools:context="me.tiagomota.getflickred.ui.home.HomeActivity">
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/text_input_layout_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Username">
-        
+        android:hint="@string/home_username_field_hint">
+
         <android.support.design.widget.TextInputEditText
             android:id="@+id/edit_text_username"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:imeOptions="actionDone"
+            android:maxLength="100"
+            android:inputType="text|textNoSuggestions" />
+
     </android.support.design.widget.TextInputLayout>
-    
+
     <android.support.v7.widget.AppCompatButton
-        android:id="@+id/btn_find"
+        android:id="@+id/btn_submit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/text_input_layout_username"
         android:layout_centerInParent="true"
-        android:text="Find" />
-    
+        android:text="@string/home_submit_btn" />
+
+    <ProgressBar
+        style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+        android:id="@+id/progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_marginTop="24dp"
+        android:indeterminate="true"
+        android:layout_below="@+id/text_input_layout_username"
+        android:visibility="gone" />
+
 </RelativeLayout>

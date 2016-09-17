@@ -1,21 +1,21 @@
-package me.tiagomota.getflickred.injection.components;
+package me.tiagomota.getflickred.ui.base.injection.components;
 
 import android.content.Context;
 
 import javax.inject.Singleton;
 
 import dagger.Component;
+import me.tiagomota.getflickred.ui.base.injection.qualifiers.ApplicationContext;
+import me.tiagomota.getflickred.ui.base.injection.modules.ApplicationModule;
 import me.tiagomota.getflickred.data.DataManager;
 import me.tiagomota.getflickred.data.injection.DataModule;
-import me.tiagomota.getflickred.injection.annotations.ApplicationContext;
-import me.tiagomota.getflickred.injection.modules.ApplicationModule;
 
 @Singleton
 @Component(modules = {
         ApplicationModule.class,
         DataModule.class
 })
-public interface ApplicationComponent extends ApplicationInjector {
+public interface ApplicationComponent {
 
     /**
      * Allows access, through the component interface, to the GetFlickrApplication context.

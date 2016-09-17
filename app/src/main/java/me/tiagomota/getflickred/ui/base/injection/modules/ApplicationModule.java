@@ -1,11 +1,11 @@
-package me.tiagomota.getflickred.injection.modules;
+package me.tiagomota.getflickred.ui.base.injection.modules;
 
 import android.app.Application;
 import android.content.Context;
 
 import dagger.Module;
 import dagger.Provides;
-import me.tiagomota.getflickred.injection.annotations.ApplicationContext;
+import me.tiagomota.getflickred.ui.base.injection.qualifiers.ApplicationContext;
 
 /**
  * Provide application-level dependencies.
