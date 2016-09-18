@@ -1,4 +1,4 @@
-package me.tiagomota.getflickred.ui.myFlickr.list;
+package me.tiagomota.getflickred.ui.flickr.list;
 
 import me.tiagomota.getflickred.ui.base.mvp.UiView;
 

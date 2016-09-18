@@ -1,4 +1,4 @@
-package me.tiagomota.getflickred.ui.myFlickr.list;
+package me.tiagomota.getflickred.ui.flickr.list;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import me.tiagomota.getflickred.R;
 import me.tiagomota.getflickred.ui.base.BaseFragment;
 
-public class MyFlickrPhotosListFragment extends BaseFragment implements MyFlickrPhotosListView {
+public class FlickrPhotosListFragment extends BaseFragment implements MyFlickrPhotosListView {
 
     public static final String TAG = "MyFlickrPhotosListFragment";
 
@@ -18,11 +18,11 @@ public class MyFlickrPhotosListFragment extends BaseFragment implements MyFlickr
     @Inject
     MyFlickrPhotosListPresenter mPresenter;
 
-    public static MyFlickrPhotosListFragment newInstance(final String userId) {
+    public static FlickrPhotosListFragment newInstance(final String userId) {
         final Bundle args = new Bundle();
         args.putString(KEY_USER_ID, userId);
 
-        final MyFlickrPhotosListFragment fragment = new MyFlickrPhotosListFragment();
+        final FlickrPhotosListFragment fragment = new FlickrPhotosListFragment();
         fragment.setArguments(args);
         return fragment;
     }

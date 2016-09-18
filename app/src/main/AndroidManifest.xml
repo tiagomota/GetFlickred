@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.myFlickr.MyFlickrActivity" />
+        <activity android:name=".ui.flickr.FlickrActivity" />
     </application>
 
 </manifest>

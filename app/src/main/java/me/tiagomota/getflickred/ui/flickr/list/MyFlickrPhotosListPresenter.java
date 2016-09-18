@@ -1,4 +1,4 @@
-package me.tiagomota.getflickred.ui.myFlickr.list;
+package me.tiagomota.getflickred.ui.flickr.list;
 
 import javax.inject.Inject;
 
