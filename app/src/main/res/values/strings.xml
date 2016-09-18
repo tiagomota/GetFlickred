@@ -10,6 +10,8 @@
 
     <string name="toolbar_username_field_hint">Enter a Flickr username</string>
 
+    <string name="flickr_loading_user">Loading user…</string>
+    <string name="flickr_loading_user_public_photos">Loading public photos…</string>
     <string name="flickr_list_item_uploaded_at">Posted at\u0020</string>
     <string name="flickr_list_item_taken_at">Taken at\u0020</string>
 </resources>

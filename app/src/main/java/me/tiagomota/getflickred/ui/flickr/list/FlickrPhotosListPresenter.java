@@ -110,9 +110,6 @@ class FlickrPhotosListPresenter extends BasePresenter<FlickrPhotosListView> {
                             new Action0() {
                                 @Override
                                 public void call() {
-                                    // update already loaded
-                                    mLoadedPhotos.addAll(newPage);
-
                                     // request view to update UI
                                     if (mNextPage > 2) {
                                         getView().handleNewPhotosPageLoaded(newPage);

@@ -71,7 +71,7 @@ public class FlickrPhotosListFragment extends BaseFragment implements FlickrPhot
     @Override
     public void handleFirstPhotosPageLoaded(final List<PhotoEntry> firstEntries) {
         if (firstEntries.isEmpty()) {
-            ((FlickrActivity) getActivity()).onUserWhithoutPhotos();
+            ((FlickrActivity) getActivity()).onUserWithoutPhotos();
         } else {
             ((FlickrActivity) getActivity()).onUserFirstPhotosPageLoaded();
             mAdapter.addAll(firstEntries);

@@ -33,9 +33,10 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
     private AppBarLayout mAppBarLayout;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
 
-    // Toolbar username field
+    // Toolbar
     private TextInputLayout mUsernameInputLayout;
     private EditText mUsernameEditText;
+    private TextView mProgressIndicator;
 
     @Override
     protected int getActivityLayout() {
@@ -49,9 +50,10 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
         mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar_layout);
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_layout);
 
-        // Toolbar username field
+        // Toolbar
         mUsernameInputLayout = (TextInputLayout) findViewById(R.id.text_input_layout_username);
         mUsernameEditText = (EditText) findViewById(R.id.edit_text_username);
+        mProgressIndicator = (TextView) findViewById(R.id.progress_indicator);
     }
 
     @Override
@@ -61,8 +63,6 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
         mPresenter.attachView(this);
 
         configureToolbarUsernameField();
-        configureUiElementsPositions();
-
     }
 
 
@@ -74,8 +74,6 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
 
     @Override
     public void onUserFound(final String userId, final String username, final String realName) {
-        // TODO dismiss progress wheel
-
         // add the list fragment to respective container
         final FlickrPhotosListFragment fragment = FlickrPhotosListFragment.newInstance(userId);
         final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -86,11 +84,16 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
         );
         ft.commit();
         getSupportFragmentManager().executePendingTransactions();
+
+        // show progress indicator
+        mProgressIndicator.setText(getString(R.string.flickr_loading_user_public_photos));
+        mProgressIndicator.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onUserNotFound(final String message) {
-        // TODO dismiss progress wheel
+        // hide progress indicator
+        mProgressIndicator.setVisibility(View.GONE);
 
         // hide content area
         displayContentArea(false);
@@ -111,7 +114,10 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
     /**
      * Handles situation when the user is loaded but, there is no photos on his account.
      */
-    public void onUserWhithoutPhotos() {
+    public void onUserWithoutPhotos() {
+        // hide progress indicator
+        mProgressIndicator.setVisibility(View.GONE);
+
         SnackBarFactory.build(
                 mCoordinatorLayout,
                 getString(R.string.error_user_without_photos),
@@ -123,9 +129,15 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
      * Handles the situation when the first batch of user public photos was loaded.
      */
     public void onUserFirstPhotosPageLoaded() {
+        // hide progress indicator
+        mProgressIndicator.setVisibility(View.GONE);
+
         // show content area.
         displayContentArea(true);
     }
+
+
+
 
     /**
      * Configures the functionality of the Toolbar Username field.
@@ -146,31 +158,15 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
         });
     }
 
-
-    /**
-     * Configures the UI to display the elements according
-     */
-    private void configureUiElementsPositions() {
-        if (isTablet()) {
-            // TODO
-        } else {
-            // handset device
-           /* final FlickrPhotosListFragment fragment = FlickrPhotosListFragment.newInstance(mUser.getId());
-            final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(R.id.fragments_container, fragment, FlickrPhotosListFragment.TAG);
-            ft.commit();
-            getSupportFragmentManager().executePendingTransactions();*/
-        }
-    }
-
     /**
      * Requests the {@link FlickrPresenter} to search for the given username.
      */
     private void searchUsername() {
         if (NetworkUtils.isNetworkConnected(this)) {
             if (!TextUtils.isEmpty(mUsernameEditText.getText())) {
-
-                // TODO show progress indicator
+                // show progress indicator
+                mProgressIndicator.setText(getString(R.string.flickr_loading_user));
+                mProgressIndicator.setVisibility(View.VISIBLE);
 
                 // clear any possible error
                 mUsernameInputLayout.setError(null);
