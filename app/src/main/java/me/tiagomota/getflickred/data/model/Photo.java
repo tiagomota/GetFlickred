@@ -34,15 +34,31 @@ public class Photo implements Parcelable {
 
     @SerializedName("ispublic")
     @Expose
-    private boolean mIsPublic;
+    private int mIsPublic;
 
     @SerializedName("isfriend")
     @Expose
-    private boolean mIsFriend;
+    private int mIsFriend;
 
     @SerializedName("isfamily")
     @Expose
-    private boolean mIsFamily;
+    private int mIsFamily;
+
+    public String getSecret() {
+        return mSecret;
+    }
+
+    public String getId() {
+        return mId;
+    }
+
+    public String getTitle() {
+        return mTitle;
+    }
+
+    public String getOwner() {
+        return mOwner;
+    }
 
     @Override
     public int describeContents() {
@@ -57,9 +73,9 @@ public class Photo implements Parcelable {
         dest.writeString(this.mServer);
         dest.writeValue(this.mFarm);
         dest.writeString(this.mTitle);
-        dest.writeByte(this.mIsPublic ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.mIsFriend ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.mIsFamily ? (byte) 1 : (byte) 0);
+        dest.writeInt(this.mIsPublic);
+        dest.writeInt(this.mIsFriend);
+        dest.writeInt(this.mIsFamily);
     }
 
     protected Photo(Parcel in) {
@@ -69,9 +85,9 @@ public class Photo implements Parcelable {
         this.mServer = in.readString();
         this.mFarm = (Integer) in.readValue(Integer.class.getClassLoader());
         this.mTitle = in.readString();
-        this.mIsPublic = in.readByte() != 0;
-        this.mIsFriend = in.readByte() != 0;
-        this.mIsFamily = in.readByte() != 0;
+        this.mIsPublic = in.readInt();
+        this.mIsFriend = in.readInt();
+        this.mIsFamily = in.readInt();
     }
 
     public static final Creator<Photo> CREATOR = new Creator<Photo>() {

@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PhotosList implements Parcelable {
+public class PhotosList extends Base {
 
     @SerializedName("photos")
     @Expose
@@ -93,7 +93,6 @@ public class PhotosList implements Parcelable {
         };
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -101,14 +100,16 @@ public class PhotosList implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
         dest.writeParcelable(this.mContent, flags);
     }
 
     protected PhotosList(Parcel in) {
+        super(in);
         this.mContent = in.readParcelable(Content.class.getClassLoader());
     }
 
-    public static final Parcelable.Creator<PhotosList> CREATOR = new Parcelable.Creator<PhotosList>() {
+    public static final Creator<PhotosList> CREATOR = new Creator<PhotosList>() {
         @Override
         public PhotosList createFromParcel(Parcel source) {
             return new PhotosList(source);

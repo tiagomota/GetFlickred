@@ -6,7 +6,7 @@ android {
     buildToolsVersion "24.0.2"
     defaultConfig {
         applicationId "me.tiagomota.getflickred"
-        minSdkVersion 15
+        minSdkVersion 21
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
@@ -35,12 +35,13 @@ dependencies {
 
     // Third Party Libraries
     compile 'io.reactivex:rxandroid:1.2.1'                                              // RxAndroid
-    compile 'io.reactivex:rxjava:1.1.6'                                                 // RxJava
+    compile 'io.reactivex:rxjava:1.2.0'                                                 // RxJava
     compile 'com.squareup.retrofit2:retrofit:2.1.0'                                     // Retrofit
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'                               // Gson converter
     compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'                               // RxJava support
     compile 'com.squareup.okhttp3:okhttp:3.4.1'                                         // OkHttp3
     compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'                            // OkHttp3 Logging Interceptor
+    compile 'com.squareup.picasso:picasso:2.5.2'                                        // Picasso
 
     // Dagger 2
     def daggerCompiler = "com.google.dagger:dagger-compiler:$DAGGER_VERSION"

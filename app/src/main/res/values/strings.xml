@@ -2,10 +2,14 @@
     <string name="app_name">GetFlickred</string>
 
     <string name="error_field_empty">Cannot be empty!</string>
-    <string name="error_no_network">No network connection</string>
+    <string name="error_user_without_photos">User has no public photos!</string>
+    <string name="error_no_network">No network connection!</string>
 
-    <string name="retry_action">RETRY</string>
+    <string name="action_retry">RETRY</string>
+    <string name="action_close">CLOSE</string>
 
-    <string name="home_username_field_hint">Flickr Username</string>
-    <string name="home_submit_btn">SEARCH</string>
+    <string name="toolbar_username_field_hint">Enter a Flickr username</string>
+
+    <string name="flickr_list_item_uploaded_at">Posted at\u0020</string>
+    <string name="flickr_list_item_taken_at">Taken at\u0020</string>
 </resources>

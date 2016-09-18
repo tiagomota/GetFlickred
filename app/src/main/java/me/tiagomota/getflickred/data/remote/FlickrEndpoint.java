@@ -9,6 +9,9 @@ final class FlickrEndpoint {
     // Find By Username
     static final String FIND_BY_USERNAME = "?method=flickr.people.findByUsername" + FLICKR_KEY + FORMAT;
 
+    // Get user info
+    static final String GET_USER_INFO = "?method=flickr.people.getInfo" + FLICKR_KEY + FORMAT;
+
     // Get Public Photos
     static final String GET_PUBLIC_PHOTOS = "?method=flickr.people.getPublicPhotos" + FLICKR_KEY + FORMAT;
 

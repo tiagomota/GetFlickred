@@ -27,6 +27,7 @@ class Base implements Parcelable {
         return mMessage;
     }
 
+
     @Override
     public int describeContents() {
         return 0;
@@ -45,8 +46,8 @@ class Base implements Parcelable {
 
     public static final Creator<Base> CREATOR = new Creator<Base>() {
         @Override
-        public Base createFromParcel(Parcel in) {
-            return new Base(in);
+        public Base createFromParcel(Parcel source) {
+            return new Base(source);
         }
 
         @Override
@@ -54,5 +55,4 @@ class Base implements Parcelable {
             return new Base[size];
         }
     };
-
 }

@@ -4,6 +4,7 @@ import me.tiagomota.getflickred.data.model.PhotoInfo;
 import me.tiagomota.getflickred.data.model.PhotoSize;
 import me.tiagomota.getflickred.data.model.PhotosList;
 import me.tiagomota.getflickred.data.model.User;
+import me.tiagomota.getflickred.data.model.UserInfo;
 import me.tiagomota.getflickred.data.remote.FlickrService;
 import rx.Observable;
 
@@ -26,14 +27,46 @@ public class DataManager {
         return mFlickrService.findByUsername(username);
     }
 
+    /**
+     * Returns an Observable prepared by Retrofit to fetch the User Info.
+     *
+     * @param userId String
+     * @return Observable
+     */
+    public Observable<UserInfo> getUserInfo(final String userId) {
+        return mFlickrService.getUserInfo(userId);
+    }
+
+    /**
+     * Returns an Observable prepared by Retrofit to fetch the User public Photos
+     * with the given user id, page and per page photos number.
+     *
+     * @param userId String
+     * @param page int
+     * @param perPage int
+     * @return Observable
+     */
     public Observable<PhotosList> getPublicPhotos(final String userId, final int page, final int perPage) {
         return mFlickrService.getPublicPhotos(userId, page, perPage);
     }
 
+    /**
+     * Returns an observable prepared by Retrofit to fetch the Photo Info.
+     *
+     * @param photoId String
+     * @param photoSecret String
+     * @return Observable
+     */
     public Observable<PhotoInfo> getPhotoInfo(final String photoId, final String photoSecret) {
         return mFlickrService.getPhotoInfo(photoId, photoSecret);
     }
 
+    /**
+     * Returns an observable prepared by Retrofit to fetch the Photo Sizes.
+     *
+     * @param photoId String
+     * @return Observable
+     */
     public Observable<PhotoSize> getPhotoSizes(final String photoId) {
         return mFlickrService.getPhotoSizes(photoId);
     }

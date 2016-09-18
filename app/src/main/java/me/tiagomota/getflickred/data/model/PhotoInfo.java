@@ -6,16 +6,26 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
-public class PhotoInfo implements Parcelable {
+public class PhotoInfo extends Base {
 
     @Expose
     @SerializedName("photo")
     private Info mInfo;
 
-    // TODO getters
+    public String getPostedDate() {
+        long epoch = mInfo.mDates.mPosted / 1000;
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(epoch * 1000));
+    }
+
+    public String getTakenDate() {
+        return mInfo.mDates.mTaken;
+    }
 
     private static class Info implements Parcelable {
 
@@ -281,10 +291,6 @@ public class PhotoInfo implements Parcelable {
             @Expose
             String mContent;
 
-            @SerializedName("machine_tag")
-            @Expose
-            int mMachineTag;
-
 
             @Override
             public int describeContents() {
@@ -298,7 +304,6 @@ public class PhotoInfo implements Parcelable {
                 dest.writeString(this.mAuthorName);
                 dest.writeString(this.mRaw);
                 dest.writeString(this.mContent);
-                dest.writeInt(this.mMachineTag);
             }
 
             protected Tag(Parcel in) {
@@ -307,10 +312,9 @@ public class PhotoInfo implements Parcelable {
                 this.mAuthorName = in.readString();
                 this.mRaw = in.readString();
                 this.mContent = in.readString();
-                this.mMachineTag = in.readInt();
             }
 
-            public static final Parcelable.Creator<Tag> CREATOR = new Parcelable.Creator<Tag>() {
+            public static final Creator<Tag> CREATOR = new Creator<Tag>() {
                 @Override
                 public Tag createFromParcel(Parcel source) {
                     return new Tag(source);
@@ -355,7 +359,7 @@ public class PhotoInfo implements Parcelable {
 
         @SerializedName("posted")
         @Expose
-        String mPosted;
+        long mPosted;
 
         @SerializedName("taken")
         @Expose
@@ -371,7 +375,7 @@ public class PhotoInfo implements Parcelable {
 
         @SerializedName("lastupdate")
         @Expose
-        String mLastUpdate;
+        long mLastUpdate;
 
 
         @Override
@@ -381,19 +385,19 @@ public class PhotoInfo implements Parcelable {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
-            dest.writeString(this.mPosted);
+            dest.writeLong(this.mPosted);
             dest.writeString(this.mTaken);
             dest.writeInt(this.mTakenGranularity);
             dest.writeInt(this.mTakenUnknown);
-            dest.writeString(this.mLastUpdate);
+            dest.writeLong(this.mLastUpdate);
         }
 
         protected Dates(Parcel in) {
-            this.mPosted = in.readString();
+            this.mPosted = in.readLong();
             this.mTaken = in.readString();
             this.mTakenGranularity = in.readInt();
             this.mTakenUnknown = in.readInt();
-            this.mLastUpdate = in.readString();
+            this.mLastUpdate = in.readLong();
         }
 
         public static final Parcelable.Creator<Dates> CREATOR = new Parcelable.Creator<Dates>() {
@@ -417,15 +421,16 @@ public class PhotoInfo implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
         dest.writeParcelable(this.mInfo, flags);
     }
 
-
     protected PhotoInfo(Parcel in) {
+        super(in);
         this.mInfo = in.readParcelable(Info.class.getClassLoader());
     }
 
-    public static final Parcelable.Creator<PhotoInfo> CREATOR = new Parcelable.Creator<PhotoInfo>() {
+    public static final Creator<PhotoInfo> CREATOR = new Creator<PhotoInfo>() {
         @Override
         public PhotoInfo createFromParcel(Parcel source) {
             return new PhotoInfo(source);

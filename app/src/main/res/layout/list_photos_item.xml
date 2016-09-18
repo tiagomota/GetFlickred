@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <ImageView
+        android:id="@+id/photo"
+        android:layout_width="@dimen/flickr_list_item_photo_size"
+        android:layout_height="@dimen/flickr_list_item_photo_size"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/photo"
+        android:layout_toRightOf="@id/photo" >
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@android:style/TextAppearance.Material.Subhead"
+            tools:text="Title" />
+
+        <TextView
+            android:id="@+id/upload_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/title"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            style="@android:style/TextAppearance.Material.Caption"
+            tools:text="Uploaded at: " />
+
+        <TextView
+            android:id="@+id/taken_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/upload_date"
+            style="@android:style/TextAppearance.Material.Caption"
+            tools:text="Taken at: " />
+    </RelativeLayout>
+
+</RelativeLayout>

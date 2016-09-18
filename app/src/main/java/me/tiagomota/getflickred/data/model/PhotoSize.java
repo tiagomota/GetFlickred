@@ -2,47 +2,69 @@ package me.tiagomota.getflickred.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class PhotoSize implements Parcelable {
+public class PhotoSize extends Base {
+
+    public enum Dimension {
+        SQUARE("Square"),
+        LARGE_SQUARE("Large Square"),
+        THUMBNAIL("Large Square"),
+        SMALL("Small"),
+        MEDIUM("Medium"),
+        ORIGINAL("Original");
+
+        private String mLabel;
+
+        Dimension(final String dimen) {
+            mLabel = dimen;
+        }
+
+        public String getLabel() {
+            return mLabel;
+        }
+    }
+
+
 
     @Expose
     @SerializedName("sizes")
     private Sizes mSizes;
 
-    public boolean isBloggable() {
-        return mSizes.mCanBlog;
+
+    @Nullable
+    public String getUrl(final Dimension dimension) {
+        String url = null;
+
+        for (final Size size : mSizes.mSize) {
+            if (size.mLabel.equalsIgnoreCase(dimension.getLabel())) {
+                url = size.mSource;
+                break;
+            }
+        }
+
+        return url;
     }
 
-    public boolean isPrintable() {
-        return mSizes.mCanPrint;
-    }
-
-    public boolean isDownloadable() {
-        return mSizes.mCanDownload;
-    }
-
-    public List<Size> getSizes() {
-        return mSizes.mSize;
-    }
 
     private static class Sizes implements Parcelable {
 
         @Expose
         @SerializedName("canblog")
-        boolean mCanBlog;
+        int mCanBlog;
 
         @Expose
         @SerializedName("canprint")
-        boolean mCanPrint;
+        int mCanPrint;
 
         @Expose
         @SerializedName("candownload")
-        boolean mCanDownload;
+        int mCanDownload;
 
         @Expose
         @SerializedName("size")
@@ -56,16 +78,16 @@ public class PhotoSize implements Parcelable {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
-            dest.writeByte(this.mCanBlog ? (byte) 1 : (byte) 0);
-            dest.writeByte(this.mCanPrint ? (byte) 1 : (byte) 0);
-            dest.writeByte(this.mCanDownload ? (byte) 1 : (byte) 0);
+            dest.writeInt(this.mCanBlog);
+            dest.writeInt(this.mCanPrint);
+            dest.writeInt(this.mCanDownload);
             dest.writeTypedList(this.mSize);
         }
 
         protected Sizes(Parcel in) {
-            this.mCanBlog = in.readByte() != 0;
-            this.mCanPrint = in.readByte() != 0;
-            this.mCanDownload = in.readByte() != 0;
+            this.mCanBlog = in.readInt();
+            this.mCanPrint = in.readInt();
+            this.mCanDownload = in.readInt();
             this.mSize = in.createTypedArrayList(Size.CREATOR);
         }
 
@@ -154,15 +176,16 @@ public class PhotoSize implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
         dest.writeParcelable(this.mSizes, flags);
     }
 
-
     protected PhotoSize(Parcel in) {
+        super(in);
         this.mSizes = in.readParcelable(Sizes.class.getClassLoader());
     }
 
-    public static final Parcelable.Creator<PhotoSize> CREATOR = new Parcelable.Creator<PhotoSize>() {
+    public static final Creator<PhotoSize> CREATOR = new Creator<PhotoSize>() {
         @Override
         public PhotoSize createFromParcel(Parcel source) {
             return new PhotoSize(source);
