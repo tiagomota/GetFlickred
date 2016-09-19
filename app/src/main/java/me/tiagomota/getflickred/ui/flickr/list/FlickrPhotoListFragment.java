@@ -19,6 +19,7 @@ import me.tiagomota.getflickred.R;
 import me.tiagomota.getflickred.ui.base.BaseFragment;
 import me.tiagomota.getflickred.ui.flickr.FlickrActivity;
 import me.tiagomota.getflickred.ui.flickr.PhotoEntry;
+import me.tiagomota.getflickred.utils.NetworkUtils;
 import me.tiagomota.getflickred.utils.SnackBarFactory;
 import me.tiagomota.getflickred.utils.ViewUtils;
 
@@ -99,7 +100,7 @@ public class FlickrPhotoListFragment extends BaseFragment
     @Override
     public void handleErrorLoadingNewPhotosPage(final String message) {
         mAdapter.removeLoadingItem();
-        // TODO show error msg.
+        SnackBarFactory.build(mRecyclerView, message).show();
     }
 
     /**
@@ -141,15 +142,22 @@ public class FlickrPhotoListFragment extends BaseFragment
                 // based on the RecyclerView position, load more content if the
                 // nr of invisible items is less or equal then the threshold defined.
                 if (isScrollingDown && invisibleItemCount <= triggerThreshold) {
-                    // attempt to load more content
-                    if (mPresenter.loadUserPublicPhotos(false)) {
-                        // if more content available, add loading item to adapter
-                        new Handler().post(new Runnable() {
-                            @Override
-                            public void run() {
-                                mAdapter.addLoadingItem();
-                            }
-                        });
+                    if (NetworkUtils.isNetworkConnected(getContext())) {
+                        // attempt to load more content
+                        if (mPresenter.loadUserPublicPhotos(false)) {
+                            // if more content available, add loading item to adapter
+                            new Handler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mAdapter.addLoadingItem();
+                                }
+                            });
+                        }
+                    } else {
+                        SnackBarFactory.build(
+                                mRecyclerView,
+                                getString(R.string.error_no_network)
+                        ).show();
                     }
                 }
             }
