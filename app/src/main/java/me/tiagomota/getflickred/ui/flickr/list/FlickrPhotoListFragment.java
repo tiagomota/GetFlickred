@@ -7,6 +7,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import java.util.List;
 
@@ -16,6 +18,7 @@ import me.tiagomota.getflickred.R;
 import me.tiagomota.getflickred.ui.base.BaseFragment;
 import me.tiagomota.getflickred.ui.flickr.FlickrActivity;
 import me.tiagomota.getflickred.ui.flickr.PhotoEntry;
+import me.tiagomota.getflickred.utils.ViewUtils;
 
 public class FlickrPhotoListFragment extends BaseFragment
         implements FlickrPhotosListView, FlickrActivity.OnUserFoundListener {
@@ -28,9 +31,13 @@ public class FlickrPhotoListFragment extends BaseFragment
     // User info
     private String mUserId;
 
-    // RecyclerView
+    // Content screen
     private RecyclerView mRecyclerView;
     private FlickrPhotosListAdapter mAdapter;
+
+    // Empty screen
+    private RelativeLayout mEmptyContainer;
+    private ImageView mEmptyImageView;
 
     @Override
     protected int getFragmentLayout() {
@@ -39,7 +46,12 @@ public class FlickrPhotoListFragment extends BaseFragment
 
     @Override
     protected void mapLayoutViews(final View root) {
+        // content screen
         mRecyclerView = (RecyclerView) root.findViewById(R.id.recycler_view);
+
+        // empty screen
+        mEmptyContainer = (RelativeLayout) root.findViewById(R.id.empty_container);
+        mEmptyImageView = (ImageView) root.findViewById(R.id.empty_image);
     }
 
     @Override
@@ -55,6 +67,13 @@ public class FlickrPhotoListFragment extends BaseFragment
         final View root = super.onCreateView(inflater, container, savedInstanceState);
 
         configurePhotosRecyclerView();
+        configureEmptyScreen();
+
+        // checks if there is any content already loaded
+        if (!mPresenter.getLoadedPhotos().isEmpty()) {
+            mRecyclerView.setVisibility(View.VISIBLE);
+            mEmptyContainer.setVisibility(View.GONE);
+        }
 
         return root;
     }
@@ -80,9 +99,14 @@ public class FlickrPhotoListFragment extends BaseFragment
     public void handleFirstPhotosPageLoaded(final List<PhotoEntry> firstEntries) {
         if (firstEntries.isEmpty()) {
             ((FlickrActivity) getActivity()).onUserWithoutPhotos();
+            mEmptyContainer.setVisibility(View.VISIBLE);
+            mRecyclerView.setVisibility(View.GONE);
         } else {
             ((FlickrActivity) getActivity()).onUserFirstPhotosPageLoaded();
+            mAdapter.notifyDataSetChanged();
             mAdapter.addAll(firstEntries);
+            mRecyclerView.setVisibility(View.VISIBLE);
+            mEmptyContainer.setVisibility(View.GONE);
         }
     }
 
@@ -109,8 +133,18 @@ public class FlickrPhotoListFragment extends BaseFragment
                     public void onSelected(final PhotoEntry photoEntry) {
                         ((FlickrActivity) getActivity()).onPhotoSelected(photoEntry);
                     }
-                });
+                }
+        );
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    /**
+     * Configures the empty screen views.
+     */
+    private void configureEmptyScreen() {
+        mEmptyImageView.setImageDrawable(
+                ViewUtils.getTintedDrawable(getContext(), R.drawable.ic_collections_black_48dp, R.color.textColorPrimary)
+        );
     }
 }

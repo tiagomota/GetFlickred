@@ -4,7 +4,6 @@ import me.tiagomota.getflickred.data.model.PhotoInfo;
 import me.tiagomota.getflickred.data.model.PhotoSize;
 import me.tiagomota.getflickred.data.model.PhotosList;
 import me.tiagomota.getflickred.data.model.User;
-import me.tiagomota.getflickred.data.model.UserInfo;
 import me.tiagomota.getflickred.data.remote.FlickrService;
 import rx.Observable;
 
@@ -25,16 +24,6 @@ public class DataManager {
      */
     public Observable<User> getUser(final String username) {
         return mFlickrService.findByUsername(username);
-    }
-
-    /**
-     * Returns an Observable prepared by Retrofit to fetch the User Info.
-     *
-     * @param userId String
-     * @return Observable
-     */
-    public Observable<UserInfo> getUserInfo(final String userId) {
-        return mFlickrService.getUserInfo(userId);
     }
 
     /**

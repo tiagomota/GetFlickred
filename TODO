@@ -1,5 +1,4 @@
-- Make rotation work for Detail Fragment by creating it's presenter.
-- Handle user not found error
 - Make infinite scrolling on List Fragment
 - Check other TODOs
 - Make Unit and UI tests
+- Make it prettier

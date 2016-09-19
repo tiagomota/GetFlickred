@@ -2,14 +2,11 @@ package me.tiagomota.getflickred.ui.flickr.detail;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
+import android.support.v4.widget.NestedScrollView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -17,8 +14,8 @@ import com.squareup.picasso.Picasso;
 import me.tiagomota.getflickred.R;
 import me.tiagomota.getflickred.data.model.PhotoSize;
 import me.tiagomota.getflickred.ui.base.BaseFragment;
-import me.tiagomota.getflickred.ui.flickr.FlickrActivity;
 import me.tiagomota.getflickred.ui.flickr.PhotoEntry;
+import me.tiagomota.getflickred.utils.ViewUtils;
 
 public class FlickrPhotoDetailFragment extends BaseFragment {
 
@@ -28,18 +25,20 @@ public class FlickrPhotoDetailFragment extends BaseFragment {
     //  The photo selected by the user
     private PhotoEntry mPhotoEntry;
 
-    // UI views
-    private RelativeLayout mContentContainer;
-    private LinearLayout mEmptyContainer;
-
+    // Content Screen views
+    private NestedScrollView mContentContainer;
     private ImageView mPhotoView;
     private TextView mTitleView;
     private TextView mDescriptionView;
     private TextView mDescriptionLabelView;
     private TextView mNrOfTagsView;
-    private TextView mNrOfCommentViews;
+    private TextView mNrOfCommentView;
     private TextView mPostedDateView;
     private TextView mTakenDateView;
+
+    // Empty screen views
+    private RelativeLayout mEmptyContainer;
+    private ImageView mEmptyImageView;
 
     @Override
     protected int getFragmentLayout() {
@@ -48,16 +47,20 @@ public class FlickrPhotoDetailFragment extends BaseFragment {
 
     @Override
     protected void mapLayoutViews(final View root) {
-        mContentContainer = (RelativeLayout) root.findViewById(R.id.content_container);
-        mEmptyContainer = (LinearLayout) root.findViewById(R.id.empty_container);
+        // Content screen
+        mContentContainer = (NestedScrollView) root.findViewById(R.id.content_container);
         mPhotoView = (ImageView) root.findViewById(R.id.image);
         mTitleView = (TextView) root.findViewById(R.id.title);
         mDescriptionView = (TextView) root.findViewById(R.id.description);
         mDescriptionLabelView = (TextView) root.findViewById(R.id.description_label);
         mNrOfTagsView = (TextView) root.findViewById(R.id.tags);
-        mNrOfCommentViews = (TextView) root.findViewById(R.id.comments);
+        mNrOfCommentView = (TextView) root.findViewById(R.id.comments);
         mPostedDateView = (TextView) root.findViewById(R.id.posted_date);
         mTakenDateView = (TextView) root.findViewById(R.id.taken_date);
+
+        // Empty screen
+        mEmptyContainer = (RelativeLayout) root.findViewById(R.id.empty_container);
+        mEmptyImageView = (ImageView) root.findViewById(R.id.empty_image);
     }
 
 
@@ -78,18 +81,9 @@ public class FlickrPhotoDetailFragment extends BaseFragment {
         }
 
         if (mPhotoEntry != null) {
-            mContentContainer.setVisibility(View.VISIBLE);
-            mEmptyContainer.setVisibility(View.GONE);
-            configurePhotoView();
-            configureTitleView();
-            configureDescriptionView();
-            configureNrOfTagsView();
-            configureNrOfCommentsView();
-            configurePostedDateView();
-            configureTakenDateView();
+            configureContentScreen();
         } else {
-            mContentContainer.setVisibility(View.GONE);
-            mEmptyContainer.setVisibility(View.VISIBLE);
+            configureEmptyScreen();
         }
     }
 
@@ -100,8 +94,8 @@ public class FlickrPhotoDetailFragment extends BaseFragment {
     }
 
     /**
-     * Returns a new instance of the {@link FlickrPhotoDetailFragment} that can show a details view of the photo,
-     * and an empty screen if the photo passed is null.
+     * Returns a new instance of the {@link FlickrPhotoDetailFragment} that can show a details view of the photo, and an empty screen if the photo passed is
+     * null.
      *
      * @param photo PhotoEntry
      * @return FlickrPhotoDetailFragment
@@ -116,6 +110,32 @@ public class FlickrPhotoDetailFragment extends BaseFragment {
         }
 
         return fragment;
+    }
+
+    /**
+     * Configures all the views of the content screen.
+     */
+    private void configureContentScreen() {
+        mContentContainer.setVisibility(View.VISIBLE);
+        mEmptyContainer.setVisibility(View.GONE);
+        configurePhotoView();
+        configureTitleView();
+        configureDescriptionView();
+        configureNrOfTagsView();
+        configureNrOfCommentsView();
+        configurePostedDateView();
+        configureTakenDateView();
+    }
+
+    /**
+     * Configures all views of the empty screen.
+     */
+    private void configureEmptyScreen() {
+        mContentContainer.setVisibility(View.GONE);
+        mEmptyContainer.setVisibility(View.VISIBLE);
+        mEmptyImageView.setImageDrawable(
+                ViewUtils.getTintedDrawable(getContext(), R.drawable.ic_image_black_48dp, R.color.textColorPrimary)
+        );
     }
 
     /**
@@ -155,31 +175,47 @@ public class FlickrPhotoDetailFragment extends BaseFragment {
      * Configures the NrOfTags view of this detail screen.
      */
     private void configureNrOfTagsView() {
-        final String tags = mPhotoEntry.getPhotoNrOfTags() + getString(R.string.flickr_detail_tags);
-        mNrOfTagsView.setText(tags);
+        try {
+            final String tags = mPhotoEntry.getPhotoNrOfTags() + getString(R.string.flickr_detail_tags);
+            mNrOfTagsView.setText(tags);
+        } catch (final NullPointerException ex) {
+            mNrOfTagsView.setVisibility(View.GONE);
+        }
     }
 
     /**
      * Configures the NrOfComments view of this detail screen.
      */
     private void configureNrOfCommentsView() {
-        final String comments = mPhotoEntry.getPhotoNrOfComments() + getString(R.string.flickr_detail_comments);
-        mNrOfCommentViews.setText(comments);
+        try {
+            final String comments = mPhotoEntry.getPhotoNrOfComments() + getString(R.string.flickr_detail_comments);
+            mNrOfCommentView.setText(comments);
+        } catch (final NullPointerException ex) {
+            mNrOfCommentView.setVisibility(View.GONE);
+        }
     }
 
     /**
      * Configures the PostedDate view of this detail screen.
      */
     private void configurePostedDateView() {
-        final String posted = getString(R.string.flickr_detail_posted) + mPhotoEntry.getPhotoUploadDate();
-        mPostedDateView.setText(posted);
+        try {
+            final String posted = getString(R.string.flickr_detail_posted) + mPhotoEntry.getPhotoUploadDate();
+            mPostedDateView.setText(posted);
+        } catch (final NullPointerException ex) {
+            mPostedDateView.setVisibility(View.GONE);
+        }
     }
 
     /**
      * Configures the TakenDate view of this detail screen.
      */
     private void configureTakenDateView() {
-        final String taken = getString(R.string.flickr_detail_taken) + mPhotoEntry.getPhotoTakenDate();
-        mTakenDateView.setText(taken);
+        try {
+            final String taken = getString(R.string.flickr_detail_taken) + mPhotoEntry.getPhotoTakenDate();
+            mTakenDateView.setText(taken);
+        } catch (final NullPointerException ex) {
+            mTakenDateView.setVisibility(View.GONE);
+        }
     }
 }

@@ -1,8 +1,7 @@
 package me.tiagomota.getflickred.ui.flickr;
 
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentTransaction;
@@ -11,14 +10,15 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import javax.inject.Inject;
 
 import me.tiagomota.getflickred.R;
+import me.tiagomota.getflickred.data.model.User;
 import me.tiagomota.getflickred.ui.base.BaseActivity;
 import me.tiagomota.getflickred.ui.flickr.detail.FlickrPhotoDetailFragment;
 import me.tiagomota.getflickred.ui.flickr.list.FlickrPhotoListFragment;
@@ -33,12 +33,13 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
 
     // General
     private CoordinatorLayout mCoordinatorLayout;
-    private Toolbar mToolbar;
 
     // Toolbar
+    private Toolbar mToolbar;
     private TextInputLayout mUsernameInputLayout;
     private EditText mUsernameEditText;
     private TextView mProgressIndicator;
+    private Button mFindButton;
 
     // User found callback
     private OnUserFoundListener mOnUserFoundListener;
@@ -52,12 +53,13 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
     protected void mapLayoutViews() {
         // General
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
         // Toolbar content
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mUsernameInputLayout = (TextInputLayout) findViewById(R.id.text_input_layout_username);
         mUsernameEditText = (EditText) findViewById(R.id.edit_text_username);
         mProgressIndicator = (TextView) findViewById(R.id.progress_indicator);
+        mFindButton = (Button) findViewById(R.id.find_button);
     }
 
     @Override
@@ -66,9 +68,13 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
         getActivityComponent().inject(this);
         mPresenter.attachView(this);
 
-        configureFragments();
         configureToolbar();
         configureToolbarUsernameField();
+        configureToolbarFindButton();
+
+        if (savedInstanceState == null) {
+            configureFragments();
+        }
     }
 
     @Override
@@ -90,21 +96,18 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
     }
 
     @Override
-    public void onUserFound(final String userId, final String username, final String realName) {
-
-        if (mOnUserFoundListener != null && mOnUserFoundListener.onUserFound(userId)) {
-            // show progress indicator
-            mProgressIndicator.setText(getString(R.string.flickr_loading_user_public_photos));
-            mProgressIndicator.setVisibility(View.VISIBLE);
+    public void onUserFound(final User user) {
+        if (mOnUserFoundListener != null && mOnUserFoundListener.onUserFound(user.getId())) {
+            showProgressIndicator(getString(R.string.flickr_loading_user_public_photos));
         } else {
-            mProgressIndicator.setVisibility(View.GONE);
+            showProgressIndicator(null);
         }
     }
 
     @Override
     public void onUserNotFound(final String message) {
         // hide progress indicator
-        mProgressIndicator.setVisibility(View.GONE);
+        showProgressIndicator(null);
 
         SnackBarFactory.build(
                 mCoordinatorLayout,
@@ -124,7 +127,7 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
      */
     public void onUserWithoutPhotos() {
         // hide progress indicator
-        mProgressIndicator.setVisibility(View.GONE);
+        showProgressIndicator(null);
 
         SnackBarFactory.build(
                 mCoordinatorLayout,
@@ -138,7 +141,7 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
      */
     public void onUserFirstPhotosPageLoaded() {
         // hide progress indicator
-        mProgressIndicator.setVisibility(View.GONE);
+        showProgressIndicator(null);
     }
 
     /**
@@ -147,6 +150,9 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
      * @param photoEntry PhotoEntry
      */
     public void onPhotoSelected(final PhotoEntry photoEntry) {
+        // hide possibly opened keyboard
+        ViewUtils.hideKeyboard(this);
+
         final FlickrPhotoDetailFragment fragment = FlickrPhotoDetailFragment.newInstance(photoEntry);
         final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
@@ -179,12 +185,13 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
             });
             mToolbar.setVisibility(View.VISIBLE);
             mUsernameInputLayout.setVisibility(View.GONE);
+            mFindButton.setVisibility(View.GONE);
         } else {
             mToolbar.setVisibility(View.GONE);
             mUsernameInputLayout.setVisibility(View.VISIBLE);
+            mFindButton.setVisibility(View.VISIBLE);
         }
     }
-
 
     /**
      * Configures the functionality of the Toolbar Username field.
@@ -194,13 +201,23 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
             @Override
             public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    // hide keyboard
-                    ViewUtils.hideKeyboard(FlickrActivity.this);
-
                     // search for inputted username
                     searchUsername();
                 }
                 return true;
+            }
+        });
+    }
+
+    /**
+     * Configure the functionality of the Find Button.
+     */
+    private void configureToolbarFindButton() {
+        mFindButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+                // search for inputted username
+                searchUsername();
             }
         });
     }
@@ -233,12 +250,12 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
      * Requests the {@link FlickrPresenter} to search for the given username.
      */
     private void searchUsername() {
+        // hide keyboard
+        ViewUtils.hideKeyboard(FlickrActivity.this);
+
         if (NetworkUtils.isNetworkConnected(this)) {
             if (!TextUtils.isEmpty(mUsernameEditText.getText())) {
-                // show progress indicator
-                mProgressIndicator.setText(getString(R.string.flickr_loading_user));
-                mProgressIndicator.setVisibility(View.VISIBLE);
-
+                showProgressIndicator(getString(R.string.flickr_loading_user));
                 // clear any possible error
                 mUsernameInputLayout.setError(null);
                 // search username
@@ -269,12 +286,24 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
         return findViewById(R.id.fragments_container) == null;
     }
 
+    /**
+     * Utility method that shows or hides the progress indicator on the Toolbar, according if the message is null or not.
+     *
+     * @param message String
+     */
+    private void showProgressIndicator(@Nullable final String message) {
+        mProgressIndicator.setVisibility(message == null ? View.GONE : View.VISIBLE);
+        mFindButton.setVisibility(message == null ? View.VISIBLE : View.GONE);
+
+        if (message != null) {
+            mProgressIndicator.setText(message);
+        }
+    }
 
     public interface OnUserFoundListener {
 
         /**
-         * Callback to when the user is loaded. Needs to return true or false according if
-         * the loading o photos will happen or not.
+         * Callback to when the user is loaded. Needs to return true or false according if the loading o photos will happen or not.
          *
          * @param userId String
          * @return boolean

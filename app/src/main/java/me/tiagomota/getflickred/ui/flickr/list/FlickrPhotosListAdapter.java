@@ -76,7 +76,12 @@ class FlickrPhotosListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
 
-    public void addAll(final List<PhotoEntry> entries) {
+    /**
+     * Adds all the entries to the local list.
+     *
+     * @param entries List
+     */
+    void addAll(final List<PhotoEntry> entries) {
         final int startInsertion = getItemCount();
         mPhotoEntries.addAll(entries);
         notifyItemRangeInserted(startInsertion, getItemCount());

@@ -1,5 +1,6 @@
 package me.tiagomota.getflickred.ui.flickr;
 
+import me.tiagomota.getflickred.data.model.User;
 import me.tiagomota.getflickred.ui.base.mvp.UiView;
 
 interface FlickrView extends UiView {
@@ -8,11 +9,9 @@ interface FlickrView extends UiView {
      * The {@link FlickrPresenter} can update the FlickrView, when it retrieves a successful answer
      * when searching for a user.
      *
-     * @param userId String
-     * @param username String
-     * @param realName String
+     * @param user User
      */
-    void onUserFound(final String userId, final String username, final String realName);
+    void onUserFound(final User user);
 
     /**
      * The {@link FlickrPresenter} can update the FlickrView, when it retrieves an error answer
