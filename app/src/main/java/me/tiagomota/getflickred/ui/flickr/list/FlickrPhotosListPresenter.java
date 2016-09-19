@@ -34,7 +34,9 @@ class FlickrPhotosListPresenter extends BasePresenter<FlickrPhotosListView> {
     private Subscription mSubscription;
 
     private List<PhotoEntry> mLoadedPhotos = new ArrayList<>();
+    private String mUserId = null;
     private int mNextPage = 1;
+    private boolean mPhotosAllLoaded = false;
 
     @Inject
     FlickrPhotosListPresenter(final DataManager dataManager) {
@@ -48,6 +50,21 @@ class FlickrPhotosListPresenter extends BasePresenter<FlickrPhotosListView> {
     }
 
     /**
+     * Handles the situation when a new user is found.
+     *
+     * @param userId String
+     */
+    boolean handleUserFound(final String userId) {
+        if (mUserId != null && mUserId.equalsIgnoreCase(userId)) {
+            return false;
+        } else {
+            mUserId = userId;
+            loadUserPublicPhotos(true);
+            return true;
+        }
+    }
+
+    /**
      * Returns the list of already loaded photos.
      *
      * @return List
@@ -57,30 +74,26 @@ class FlickrPhotosListPresenter extends BasePresenter<FlickrPhotosListView> {
     }
 
     /**
-     * Fetch the next available page of photos of the given user.
-     * Returns false if there is no more content to load.
+     * Fetch the next available page of photos of the given user. Returns false if there is no more content to load.
      *
-     * @param userId String
      * @param reboot boolean restarts the page counter and clears stored loaded photos.
      * @return boolean
      */
-    boolean loadUserPublicPhotos(final String userId, final boolean reboot) {
+    boolean loadUserPublicPhotos(final boolean reboot) {
+        // in case of a reboot cancel any ongoing requests and reset content.
         if (reboot) {
+            RxUtils.cancel(mSubscription);
             mNextPage = 1;
             mLoadedPhotos.clear();
         }
 
-        if (mNextPage > 0) {
+        if (mNextPage > 0 && !RxUtils.onGoing(mSubscription)) {
             final List<PhotoEntry> newPage = new ArrayList<>();
-            mSubscription = mDataManager.getPublicPhotos(userId, mNextPage, PER_PAGE)
+            mSubscription = mDataManager.getPublicPhotos(mUserId, mNextPage, PER_PAGE)
                     .flatMap(new Func1<PhotosList, Observable<Photo>>() {
                         @Override
                         public Observable<Photo> call(final PhotosList photosList) {
-                            if (photosList.getPage() < photosList.getTotalPages()) {
-                                mNextPage++; // update next page to load.
-                            } else {
-                                mNextPage = -1; // mark content all loaded.
-                            }
+                            mPhotosAllLoaded = photosList.getPage() < photosList.getTotalPages();
                             return Observable.from(photosList.getPhotos());
                         }
                     })
@@ -118,13 +131,21 @@ class FlickrPhotosListPresenter extends BasePresenter<FlickrPhotosListView> {
                                 @Override
                                 public void call() {
                                     // request view to update UI
-                                    if (mNextPage > 2) {
+                                    if (mNextPage > 1) {
                                         getView().handleNewPhotosPageLoaded(newPage);
                                     } else {
                                         getView().handleFirstPhotosPageLoaded(newPage);
                                     }
+
+                                    // update next page
+                                    if (mPhotosAllLoaded) {
+                                        mNextPage++;
+                                    } else {
+                                        mNextPage = -1;
+                                    }
                                 }
                             });
+
             return true;
         } else {
             return false;

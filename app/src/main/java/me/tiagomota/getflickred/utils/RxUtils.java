@@ -14,4 +14,14 @@ public final class RxUtils {
             subscription.unsubscribe();
         }
     }
+
+    /**
+     * Given a request (observable) subscription, check if it is on going or not.
+     *
+     * @param subscription {@link Subscription}
+     * @return boolean
+     */
+    public static boolean onGoing(final Subscription subscription) {
+        return subscription != null && !subscription.isUnsubscribed();
+    }
 }

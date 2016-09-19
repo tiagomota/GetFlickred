@@ -17,9 +17,8 @@ public abstract class BaseFragment extends Fragment {
     private FragmentComponent mFragmentComponent;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         try {
             // inject hte Object graph dependencies here.
             final BaseActivity activity = (BaseActivity) getActivity();

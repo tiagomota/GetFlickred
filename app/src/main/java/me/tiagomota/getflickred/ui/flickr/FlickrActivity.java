@@ -41,9 +41,6 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
     private TextView mProgressIndicator;
     private Button mFindButton;
 
-    // User found callback
-    private OnUserFoundListener mOnUserFoundListener;
-
     @Override
     protected int getActivityLayout() {
         return R.layout.activity_flickr;
@@ -97,9 +94,16 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
 
     @Override
     public void onUserFound(final User user) {
-        if (mOnUserFoundListener != null && mOnUserFoundListener.onUserFound(user.getId())) {
-            showProgressIndicator(getString(R.string.flickr_loading_user_public_photos));
-        } else {
+        try {
+            final FlickrPhotoListFragment listFragment = (FlickrPhotoListFragment) getSupportFragmentManager()
+                    .findFragmentByTag(FlickrPhotoListFragment.TAG);
+
+            if (listFragment.onUserFound(user.getId())) {
+                showProgressIndicator(getString(R.string.flickr_loading_user_public_photos));
+            } else {
+                showProgressIndicator(null);
+            }
+        } catch (final Exception ex) {
             showProgressIndicator(null);
         }
     }
@@ -235,7 +239,6 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
                 FlickrPhotoListFragment.TAG
         );
         listFT.commit();
-        mOnUserFoundListener = listFragment;
 
         // check if necessary to add the detail fragment
         if (isTablet() && getSupportFragmentManager().getBackStackEntryCount() == 0) {
@@ -298,16 +301,5 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
         if (message != null) {
             mProgressIndicator.setText(message);
         }
-    }
-
-    public interface OnUserFoundListener {
-
-        /**
-         * Callback to when the user is loaded. Needs to return true or false according if the loading o photos will happen or not.
-         *
-         * @param userId String
-         * @return boolean
-         */
-        boolean onUserFound(final String userId);
     }
 }

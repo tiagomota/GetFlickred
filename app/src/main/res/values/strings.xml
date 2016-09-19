@@ -16,6 +16,7 @@
     <string name="flickr_loading_user_public_photos">Loading public photos…</string>
     <string name="flickr_list_item_uploaded_at">Posted at\u0020</string>
     <string name="flickr_list_item_taken_at">Taken at\u0020</string>
+    <string name="flickr_list_item_loading_more_photos">Loading more photos…</string>
     <string name="flickr_list_search_user_first">Search for a Flickr user and see the public photos</string>
 
     <string name="flickr_detail_select_image_from_list">Choose a photo and see the details</string>

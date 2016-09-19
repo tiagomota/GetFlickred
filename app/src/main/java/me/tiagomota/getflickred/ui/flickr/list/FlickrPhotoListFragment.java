@@ -1,6 +1,7 @@
 package me.tiagomota.getflickred.ui.flickr.list;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,18 +19,16 @@ import me.tiagomota.getflickred.R;
 import me.tiagomota.getflickred.ui.base.BaseFragment;
 import me.tiagomota.getflickred.ui.flickr.FlickrActivity;
 import me.tiagomota.getflickred.ui.flickr.PhotoEntry;
+import me.tiagomota.getflickred.utils.SnackBarFactory;
 import me.tiagomota.getflickred.utils.ViewUtils;
 
 public class FlickrPhotoListFragment extends BaseFragment
-        implements FlickrPhotosListView, FlickrActivity.OnUserFoundListener {
+        implements FlickrPhotosListView {
 
     public static final String TAG = "MyFlickrPhotosListFragment";
 
     @Inject
     FlickrPhotosListPresenter mPresenter;
-
-    // User info
-    private String mUserId;
 
     // Content screen
     private RecyclerView mRecyclerView;
@@ -55,16 +54,10 @@ public class FlickrPhotoListFragment extends BaseFragment
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         getFragmentComponent().inject(this);
         mPresenter.attachView(this);
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable final Bundle savedInstanceState) {
-        final View root = super.onCreateView(inflater, container, savedInstanceState);
 
         configurePhotosRecyclerView();
         configureEmptyScreen();
@@ -74,25 +67,12 @@ public class FlickrPhotoListFragment extends BaseFragment
             mRecyclerView.setVisibility(View.VISIBLE);
             mEmptyContainer.setVisibility(View.GONE);
         }
-
-        return root;
     }
 
     @Override
     public void onDestroy() {
         mPresenter.detachView();
         super.onDestroy();
-    }
-
-    @Override
-    public boolean onUserFound(final String userId) {
-        if (mUserId != null && mUserId.equalsIgnoreCase(userId)) {
-            return false;
-        } else {
-            mUserId = userId;
-            mPresenter.loadUserPublicPhotos(userId, true);
-            return true;
-        }
     }
 
     @Override
@@ -112,20 +92,32 @@ public class FlickrPhotoListFragment extends BaseFragment
 
     @Override
     public void handleNewPhotosPageLoaded(final List<PhotoEntry> newEntries) {
-        // TODO dismiss progress indicator
+        mAdapter.removeLoadingItem();
         mAdapter.addAll(newEntries);
     }
 
     @Override
     public void handleErrorLoadingNewPhotosPage(final String message) {
-        // TODO dismiss progress indicator
+        mAdapter.removeLoadingItem();
         // TODO show error msg.
+    }
+
+    /**
+     * Allows activity to tell {@link FlickrPhotoListFragment} that a new user
+     * was found.
+     *
+     * @param userId String
+     * @return boolean
+     */
+    public boolean onUserFound(final String userId) {
+        return mPresenter.handleUserFound(userId);
     }
 
     /**
      * Configures the Photos Recycler View.
      */
     private void configurePhotosRecyclerView() {
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         mAdapter = new FlickrPhotosListAdapter(
                 mPresenter.getLoadedPhotos(),
                 new FlickrPhotosListAdapter.OnPhotoSelectedListener() {
@@ -136,7 +128,32 @@ public class FlickrPhotoListFragment extends BaseFragment
                 }
         );
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(final RecyclerView recyclerView, final int dx, final int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                final boolean isScrollingDown = dy > 0;
+                final int invisibleItemCount = recyclerView.getAdapter().getItemCount() - recyclerView.getChildCount();
+                final int triggerThreshold = layoutManager.findFirstVisibleItemPosition() + 2;
+
+                // based on the RecyclerView position, load more content if the
+                // nr of invisible items is less or equal then the threshold defined.
+                if (isScrollingDown && invisibleItemCount <= triggerThreshold) {
+                    // attempt to load more content
+                    if (mPresenter.loadUserPublicPhotos(false)) {
+                        // if more content available, add loading item to adapter
+                        new Handler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mAdapter.addLoadingItem();
+                            }
+                        });
+                    }
+                }
+            }
+        });
     }
 
     /**

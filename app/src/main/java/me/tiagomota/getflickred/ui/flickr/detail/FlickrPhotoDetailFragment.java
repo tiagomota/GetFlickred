@@ -1,16 +1,18 @@
 package me.tiagomota.getflickred.ui.flickr.detail;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
+import android.text.Html;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import me.tiagomota.getflickred.BuildConfig;
 import me.tiagomota.getflickred.R;
 import me.tiagomota.getflickred.data.model.PhotoSize;
 import me.tiagomota.getflickred.ui.base.BaseFragment;
@@ -63,16 +65,10 @@ public class FlickrPhotoDetailFragment extends BaseFragment {
         mEmptyImageView = (ImageView) root.findViewById(R.id.empty_image);
     }
 
-
-    @Override
-    public void onCreate(@Nullable final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getFragmentComponent().inject(this);
-    }
-
     @Override
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        getFragmentComponent().inject(this);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(KEY_PHOTO_ENTRY)) {
             mPhotoEntry = savedInstanceState.getParcelable(KEY_PHOTO_ENTRY);
@@ -164,7 +160,8 @@ public class FlickrPhotoDetailFragment extends BaseFragment {
         if (description != null && !description.isEmpty()) {
             mDescriptionLabelView.setVisibility(View.VISIBLE);
             mDescriptionView.setVisibility(View.VISIBLE);
-            mDescriptionView.setText(description);
+            //noinspection deprecation
+            mDescriptionView.setText(Html.fromHtml(description));
         } else {
             mDescriptionLabelView.setVisibility(View.GONE);
             mDescriptionView.setVisibility(View.GONE);

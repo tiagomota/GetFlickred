@@ -21,6 +21,9 @@ class FlickrPhotosListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private final List<PhotoEntry> mPhotoEntries;
     private final OnPhotoSelectedListener mOnPhotoSelectedListener;
 
+    private static final int NORMAL = 0x01;
+    private static final int LOADING = 0x02;
+
     FlickrPhotosListAdapter(final List<PhotoEntry> photos,
                             final OnPhotoSelectedListener listener) {
         mPhotoEntries = photos;
@@ -29,45 +32,46 @@ class FlickrPhotosListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
-        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_photo_item, parent, false);
-        return new PhotoViewHolder(view);
+        if (viewType == NORMAL) {
+            final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_photo_item, parent, false);
+            return new PhotoViewHolder(view);
+        } else {
+            final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_loading_item, parent, false);
+            return new LoadingViewHolder(view);
+        }
     }
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
-        final PhotoViewHolder vh = (PhotoViewHolder) holder;
-        final PhotoEntry entry = mPhotoEntries.get(position);
+        if (getItemViewType(position) == NORMAL) {
+            final PhotoViewHolder vh = (PhotoViewHolder) holder;
+            final PhotoEntry entry = mPhotoEntries.get(position);
 
-        // set title
-        vh.mTitleView.setText(entry.getPhotoTitle());
+            // set title
+            vh.mTitleView.setText(entry.getPhotoTitle());
 
-        // set uploaded at
-        final String uploadedDate = vh.itemView.getContext().getString(R.string.flickr_list_item_uploaded_at) + entry.getPhotoUploadDate();
-        vh.mUploadedAtView.setText(uploadedDate);
+            // set comments
+            final String nrOfComments = entry.getPhotoNrOfComments() + vh.itemView.getContext().getString(R.string.flickr_detail_comments);
+            vh.mCommentsView.setText(nrOfComments);
 
-        // set taken date
-        final String takenDate = vh.itemView.getContext().getString(R.string.flickr_list_item_taken_at) + entry.getPhotoTakenDate();
-        vh.mTakenAtView.setText(takenDate);
-
-        // set photo view
-        final String url = entry.getPhotoImageUrl(PhotoSize.Dimension.SQUARE);
-        if (url != null) {
-            Picasso.with(vh.itemView.getContext())
-                    .load(url)
-                    .into(vh.mPhotoView);
-        } else {
-            // TODO
-        }
-
-        // set click listener
-        vh.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-                if (mOnPhotoSelectedListener != null) {
-                    mOnPhotoSelectedListener.onSelected(entry);
-                }
+            // set photo view
+            final String url = entry.getPhotoImageUrl(PhotoSize.Dimension.LARGE_SQUARE);
+            if (url != null) {
+                Picasso.with(vh.itemView.getContext()).load(url).fit().into(vh.mPhotoView);
+            } else {
+                Picasso.with(vh.itemView.getContext()).load(R.drawable.ic_image_black_48dp).fit().into(vh.mPhotoView);
             }
-        });
+
+            // set click listener
+            vh.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View view) {
+                    if (mOnPhotoSelectedListener != null) {
+                        mOnPhotoSelectedListener.onSelected(entry);
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -75,6 +79,35 @@ class FlickrPhotosListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         return mPhotoEntries.size();
     }
 
+    @Override
+    public int getItemViewType(final int position) {
+        if (mPhotoEntries.get(position) == null) {
+            return LOADING;
+        } else {
+            return NORMAL;
+        }
+    }
+
+    /**
+     * Adds a loading indicator to the list.
+     */
+    void addLoadingItem() {
+        if (mPhotoEntries.get(getItemCount() - 1) != null) {
+            mPhotoEntries.add(null); // add empty one to simulate loading item
+            notifyItemInserted(getItemCount());
+        }
+    }
+
+    /**
+     * Removed loading indicator from the list.
+     */
+    void removeLoadingItem() {
+        if (mPhotoEntries.get(getItemCount() - 1) == null) {
+            final int pos = getItemCount() - 1;
+            mPhotoEntries.remove(pos);
+            notifyItemRemoved(pos);
+        }
+    }
 
     /**
      * Adds all the entries to the local list.
@@ -98,20 +131,31 @@ class FlickrPhotosListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
 
+    /**
+     * ViewHolder for Photo list items.
+     */
     private static final class PhotoViewHolder extends RecyclerView.ViewHolder {
 
         ImageView mPhotoView;
         TextView mTitleView;
-        TextView mUploadedAtView;
-        TextView mTakenAtView;
+        TextView mCommentsView;
 
         PhotoViewHolder(final View view) {
             super(view);
 
             mPhotoView = (ImageView) view.findViewById(R.id.photo);
             mTitleView = (TextView) view.findViewById(R.id.title);
-            mUploadedAtView = (TextView) view.findViewById(R.id.upload_date);
-            mTakenAtView = (TextView) view.findViewById(R.id.taken_date);
+            mCommentsView = (TextView) view.findViewById(R.id.comments);
+        }
+    }
+
+    /**
+     * ViewHolder for the Loading indicator list items.
+     */
+    private static final class LoadingViewHolder extends RecyclerView.ViewHolder {
+
+        LoadingViewHolder(final View view) {
+            super(view);
         }
     }
 }
