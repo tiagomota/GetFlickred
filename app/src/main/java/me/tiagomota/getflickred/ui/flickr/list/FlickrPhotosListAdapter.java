@@ -50,6 +50,10 @@ class FlickrPhotosListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             // set title
             vh.mTitleView.setText(entry.getPhotoTitle());
 
+            // set tags
+            final String nrOfTags = entry.getPhotoNrOfTags() + vh.itemView.getContext().getString(R.string.flickr_detail_tags);
+            vh.mTagsView.setText(nrOfTags);
+
             // set comments
             final String nrOfComments = entry.getPhotoNrOfComments() + vh.itemView.getContext().getString(R.string.flickr_detail_comments);
             vh.mCommentsView.setText(nrOfComments);
@@ -138,6 +142,7 @@ class FlickrPhotosListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         ImageView mPhotoView;
         TextView mTitleView;
+        TextView mTagsView;
         TextView mCommentsView;
 
         PhotoViewHolder(final View view) {
@@ -145,6 +150,7 @@ class FlickrPhotosListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
             mPhotoView = (ImageView) view.findViewById(R.id.photo);
             mTitleView = (TextView) view.findViewById(R.id.title);
+            mTagsView = (TextView) view.findViewById(R.id.tags);
             mCommentsView = (TextView) view.findViewById(R.id.comments);
         }
     }

@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import javax.inject.Inject;
@@ -41,6 +43,10 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
     private TextView mProgressIndicator;
     private Button mFindButton;
 
+    // Empty content
+    private RelativeLayout mEmptyContainer;
+    private ImageView mEmptyImage;
+
     @Override
     protected int getActivityLayout() {
         return R.layout.activity_flickr;
@@ -57,6 +63,10 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
         mUsernameEditText = (EditText) findViewById(R.id.edit_text_username);
         mProgressIndicator = (TextView) findViewById(R.id.progress_indicator);
         mFindButton = (Button) findViewById(R.id.find_button);
+
+        // Screen content
+        mEmptyContainer = (RelativeLayout) findViewById(R.id.empty_container);
+        mEmptyImage = (ImageView) findViewById(R.id.empty_image);
     }
 
     @Override
@@ -70,7 +80,8 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
         configureToolbarFindButton();
 
         if (savedInstanceState == null) {
-            configureFragments();
+            configureContentContainer();
+            configureEmptyContainer();
         }
     }
 
@@ -96,7 +107,7 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
     public void onUserFound(final User user) {
         try {
             final FlickrPhotoListFragment listFragment = (FlickrPhotoListFragment) getSupportFragmentManager()
-                    .findFragmentByTag(FlickrPhotoListFragment.TAG);
+                            .findFragmentByTag(FlickrPhotoListFragment.TAG);
 
             if (listFragment.onUserFound(user.getId())) {
                 showProgressIndicator(getString(R.string.flickr_loading_user_public_photos));
@@ -133,6 +144,9 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
         // hide progress indicator
         showProgressIndicator(null);
 
+        // show empty screen
+        mEmptyContainer.setVisibility(View.VISIBLE);
+
         SnackBarFactory.build(
                 mCoordinatorLayout,
                 getString(R.string.error_user_without_photos),
@@ -142,10 +156,24 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
 
     /**
      * Handles the situation when the first batch of user public photos was loaded.
+     *
+     * @param firstPhotoInList PhotoEntry
      */
-    public void onUserFirstPhotosPageLoaded() {
+    public void onUserFirstPhotosPageLoaded(final PhotoEntry firstPhotoInList) {
+        // auto select first image for detail
+        if (isTablet()) {
+            final FlickrPhotoDetailFragment fragment = FlickrPhotoDetailFragment.newInstance(firstPhotoInList);
+            final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.detail_fragment_container, fragment, FlickrPhotoDetailFragment.TAG);
+            ft.commit();
+            getSupportFragmentManager().executePendingTransactions();
+        }
+
         // hide progress indicator
         showProgressIndicator(null);
+
+        // show content screen
+        mEmptyContainer.setVisibility(View.GONE);
     }
 
     /**
@@ -175,9 +203,16 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
     }
 
     /**
+     * Allows fragments to request the activity to show the content screen.
+     */
+    public void showContentContainer() {
+        mEmptyContainer.setVisibility(View.GONE);
+    }
+
+    /**
      * Configures the Toolbar that is inside the AppBarLayout.
      */
-    public void configureToolbar() {
+    private void configureToolbar() {
         if (!isTablet() && getSupportFragmentManager().getBackStackEntryCount() > 0) {
             mToolbar.setTitle(getString(R.string.toolbar_photo_detail_fragment_title));
             mToolbar.setNavigationIcon(ContextCompat.getDrawable(this, R.drawable.ic_arrow_back_white_24dp));
@@ -227,9 +262,9 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
     }
 
     /**
-     * Adds the fragments necessary to populate the view.
+     * Adds the content container to populate the view.
      */
-    private void configureFragments() {
+    private void configureContentContainer() {
         // add the list fragment to respective container
         final FlickrPhotoListFragment listFragment = new FlickrPhotoListFragment();
         final FragmentTransaction listFT = getSupportFragmentManager().beginTransaction();
@@ -239,14 +274,15 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
                 FlickrPhotoListFragment.TAG
         );
         listFT.commit();
+    }
 
-        // check if necessary to add the detail fragment
-        if (isTablet() && getSupportFragmentManager().getBackStackEntryCount() == 0) {
-            final FlickrPhotoDetailFragment detailFragment = FlickrPhotoDetailFragment.newInstance(null);
-            final FragmentTransaction detailFT = getSupportFragmentManager().beginTransaction();
-            detailFT.replace(R.id.detail_fragment_container, detailFragment, FlickrPhotoDetailFragment.TAG);
-            detailFT.commit();
-        }
+    /**
+     * Configures the empty results view.
+     */
+    private void configureEmptyContainer() {
+        mEmptyImage.setImageDrawable(
+                ViewUtils.getTintedDrawable(this, R.drawable.ic_image_black_48dp, R.color.dividerColor)
+        );
     }
 
     /**

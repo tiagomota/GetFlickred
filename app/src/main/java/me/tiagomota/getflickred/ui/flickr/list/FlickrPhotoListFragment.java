@@ -5,11 +5,7 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import java.util.List;
 
@@ -21,7 +17,6 @@ import me.tiagomota.getflickred.ui.flickr.FlickrActivity;
 import me.tiagomota.getflickred.ui.flickr.PhotoEntry;
 import me.tiagomota.getflickred.utils.NetworkUtils;
 import me.tiagomota.getflickred.utils.SnackBarFactory;
-import me.tiagomota.getflickred.utils.ViewUtils;
 
 public class FlickrPhotoListFragment extends BaseFragment
         implements FlickrPhotosListView {
@@ -35,10 +30,6 @@ public class FlickrPhotoListFragment extends BaseFragment
     private RecyclerView mRecyclerView;
     private FlickrPhotosListAdapter mAdapter;
 
-    // Empty screen
-    private RelativeLayout mEmptyContainer;
-    private ImageView mEmptyImageView;
-
     @Override
     protected int getFragmentLayout() {
         return R.layout.fragment_flickr_photo_list;
@@ -48,10 +39,6 @@ public class FlickrPhotoListFragment extends BaseFragment
     protected void mapLayoutViews(final View root) {
         // content screen
         mRecyclerView = (RecyclerView) root.findViewById(R.id.recycler_view);
-
-        // empty screen
-        mEmptyContainer = (RelativeLayout) root.findViewById(R.id.empty_container);
-        mEmptyImageView = (ImageView) root.findViewById(R.id.empty_image);
     }
 
     @Override
@@ -61,12 +48,10 @@ public class FlickrPhotoListFragment extends BaseFragment
         mPresenter.attachView(this);
 
         configurePhotosRecyclerView();
-        configureEmptyScreen();
 
-        // checks if there is any content already loaded
+        // checks if there is any content already loaded, and hide empty screen
         if (!mPresenter.getLoadedPhotos().isEmpty()) {
-            mRecyclerView.setVisibility(View.VISIBLE);
-            mEmptyContainer.setVisibility(View.GONE);
+            ((FlickrActivity) getActivity()).showContentContainer();
         }
     }
 
@@ -80,14 +65,10 @@ public class FlickrPhotoListFragment extends BaseFragment
     public void handleFirstPhotosPageLoaded(final List<PhotoEntry> firstEntries) {
         if (firstEntries.isEmpty()) {
             ((FlickrActivity) getActivity()).onUserWithoutPhotos();
-            mEmptyContainer.setVisibility(View.VISIBLE);
-            mRecyclerView.setVisibility(View.GONE);
         } else {
-            ((FlickrActivity) getActivity()).onUserFirstPhotosPageLoaded();
+            ((FlickrActivity) getActivity()).onUserFirstPhotosPageLoaded(firstEntries.get(0));
             mAdapter.notifyDataSetChanged();
             mAdapter.addAll(firstEntries);
-            mRecyclerView.setVisibility(View.VISIBLE);
-            mEmptyContainer.setVisibility(View.GONE);
         }
     }
 
@@ -162,14 +143,5 @@ public class FlickrPhotoListFragment extends BaseFragment
                 }
             }
         });
-    }
-
-    /**
-     * Configures the empty screen views.
-     */
-    private void configureEmptyScreen() {
-        mEmptyImageView.setImageDrawable(
-                ViewUtils.getTintedDrawable(getContext(), R.drawable.ic_collections_black_48dp, R.color.textColorPrimary)
-        );
     }
 }
