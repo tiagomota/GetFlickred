@@ -8,10 +8,19 @@
     <string name="action_retry">RETRY</string>
     <string name="action_close">CLOSE</string>
 
+    <string name="toolbar_photo_detail_fragment_title">Photo Details</string>
     <string name="toolbar_username_field_hint">Enter a Flickr username</string>
 
     <string name="flickr_loading_user">Loading user…</string>
     <string name="flickr_loading_user_public_photos">Loading public photos…</string>
     <string name="flickr_list_item_uploaded_at">Posted at\u0020</string>
     <string name="flickr_list_item_taken_at">Taken at\u0020</string>
+
+    <string name="flickr_detail_select_image_from_list">Select a photo and see the details!</string>
+    <string name="flickr_detail_description">Description</string>
+    <string name="flickr_detail_tags">\u0020 Tags</string>
+    <string name="flickr_detail_comments">\u0020 Comments</string>
+    <string name="flickr_detail_posted">Posted\n</string>
+    <string name="flickr_detail_taken">Taken\n</string>
+
 </resources>

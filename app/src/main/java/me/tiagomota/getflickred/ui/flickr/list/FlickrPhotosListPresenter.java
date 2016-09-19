@@ -14,6 +14,7 @@ import me.tiagomota.getflickred.data.model.PhotoSize;
 import me.tiagomota.getflickred.data.model.PhotosList;
 import me.tiagomota.getflickred.ui.base.injection.scope.PersistentScope;
 import me.tiagomota.getflickred.ui.base.mvp.BasePresenter;
+import me.tiagomota.getflickred.ui.flickr.PhotoEntry;
 import me.tiagomota.getflickred.utils.RxUtils;
 import rx.Observable;
 import rx.Subscription;
@@ -27,7 +28,7 @@ import rx.schedulers.Schedulers;
 @PersistentScope
 class FlickrPhotosListPresenter extends BasePresenter<FlickrPhotosListView> {
 
-    private static final int PER_PAGE = 5;
+    private static final int PER_PAGE = 7;
 
     private final DataManager mDataManager;
     private Subscription mSubscription;
@@ -60,9 +61,15 @@ class FlickrPhotosListPresenter extends BasePresenter<FlickrPhotosListView> {
      * Returns false if there is no more content to load.
      *
      * @param userId String
+     * @param reboot boolean restarts the page counter and clears stored loaded photos.
      * @return boolean
      */
-    boolean loadUserPublicPhotos(final String userId) {
+    boolean loadUserPublicPhotos(final String userId, final boolean reboot) {
+        if (reboot) {
+            mNextPage = 1;
+            mLoadedPhotos.clear();
+        }
+
         if (mNextPage > 0) {
             final List<PhotoEntry> newPage = new ArrayList<>();
             mSubscription = mDataManager.getPublicPhotos(userId, mNextPage, PER_PAGE)

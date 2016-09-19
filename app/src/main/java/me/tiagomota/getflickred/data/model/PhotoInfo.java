@@ -10,7 +10,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 public class PhotoInfo extends Base {
 
@@ -25,6 +24,18 @@ public class PhotoInfo extends Base {
 
     public String getTakenDate() {
         return mInfo.mDates.mTaken;
+    }
+
+    public String getDescription() {
+        return mInfo.mDescription.mContent;
+    }
+
+    public String getComments() {
+        return mInfo.mComments.mContent;
+    }
+
+    public String getTags() {
+        return "" + mInfo.mTags.mTags.size();
     }
 
     private static class Info implements Parcelable {
@@ -199,7 +210,7 @@ public class PhotoInfo extends Base {
 
         @SerializedName("_content")
         @Expose
-        String content;
+        String mContent;
 
 
         @Override
@@ -209,11 +220,11 @@ public class PhotoInfo extends Base {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
-            dest.writeString(this.content);
+            dest.writeString(this.mContent);
         }
 
         protected Description(Parcel in) {
-            this.content = in.readString();
+            this.mContent = in.readString();
         }
 
         public static final Parcelable.Creator<Description> CREATOR = new Parcelable.Creator<Description>() {
@@ -233,7 +244,7 @@ public class PhotoInfo extends Base {
 
         @SerializedName("_content")
         @Expose
-        String content;
+        String mContent;
 
 
         @Override
@@ -243,11 +254,11 @@ public class PhotoInfo extends Base {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
-            dest.writeString(this.content);
+            dest.writeString(this.mContent);
         }
 
         protected Comments(Parcel in) {
-            this.content = in.readString();
+            this.mContent = in.readString();
         }
 
         public static final Parcelable.Creator<Comments> CREATOR = new Parcelable.Creator<Comments>() {

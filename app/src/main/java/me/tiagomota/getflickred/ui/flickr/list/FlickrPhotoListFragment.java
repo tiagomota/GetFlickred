@@ -15,16 +15,18 @@ import javax.inject.Inject;
 import me.tiagomota.getflickred.R;
 import me.tiagomota.getflickred.ui.base.BaseFragment;
 import me.tiagomota.getflickred.ui.flickr.FlickrActivity;
+import me.tiagomota.getflickred.ui.flickr.PhotoEntry;
 
-public class FlickrPhotosListFragment extends BaseFragment implements FlickrPhotosListView {
+public class FlickrPhotoListFragment extends BaseFragment
+        implements FlickrPhotosListView, FlickrActivity.OnUserFoundListener {
 
     public static final String TAG = "MyFlickrPhotosListFragment";
-    private static final String KEY_USER_ID = "key_user_id";
-
-    private String mUserID;
 
     @Inject
     FlickrPhotosListPresenter mPresenter;
+
+    // User info
+    private String mUserId;
 
     // RecyclerView
     private RecyclerView mRecyclerView;
@@ -32,7 +34,7 @@ public class FlickrPhotosListFragment extends BaseFragment implements FlickrPhot
 
     @Override
     protected int getFragmentLayout() {
-        return R.layout.fragment_flickr_photos_list;
+        return R.layout.fragment_flickr_photo_list;
     }
 
     @Override
@@ -45,11 +47,6 @@ public class FlickrPhotosListFragment extends BaseFragment implements FlickrPhot
         super.onCreate(savedInstanceState);
         getFragmentComponent().inject(this);
         mPresenter.attachView(this);
-
-        if (getArguments() != null && getArguments().containsKey(KEY_USER_ID)) {
-            mUserID = getArguments().getString(KEY_USER_ID);
-            mPresenter.loadUserPublicPhotos(mUserID);
-        }
     }
 
     @Nullable
@@ -66,6 +63,17 @@ public class FlickrPhotosListFragment extends BaseFragment implements FlickrPhot
     public void onDestroy() {
         mPresenter.detachView();
         super.onDestroy();
+    }
+
+    @Override
+    public boolean onUserFound(final String userId) {
+        if (mUserId != null && mUserId.equalsIgnoreCase(userId)) {
+            return false;
+        } else {
+            mUserId = userId;
+            mPresenter.loadUserPublicPhotos(userId, true);
+            return true;
+        }
     }
 
     @Override
@@ -91,26 +99,17 @@ public class FlickrPhotosListFragment extends BaseFragment implements FlickrPhot
     }
 
     /**
-     * Creates a new instance of the FlickrPhotosListFragment.
-     *
-     * @param userId String
-     * @return FlickrPhotosListFragment
-     */
-    public static FlickrPhotosListFragment newInstance(final String userId) {
-        final Bundle args = new Bundle();
-        args.putString(KEY_USER_ID, userId);
-
-        final FlickrPhotosListFragment fragment = new FlickrPhotosListFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-
-    /**
      * Configures the Photos Recycler View.
      */
     private void configurePhotosRecyclerView() {
-        mAdapter = new FlickrPhotosListAdapter(mPresenter.getLoadedPhotos());
+        mAdapter = new FlickrPhotosListAdapter(
+                mPresenter.getLoadedPhotos(),
+                new FlickrPhotosListAdapter.OnPhotoSelectedListener() {
+                    @Override
+                    public void onSelected(final PhotoEntry photoEntry) {
+                        ((FlickrActivity) getActivity()).onPhotoSelected(photoEntry);
+                    }
+                });
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }

@@ -6,6 +6,8 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -18,7 +20,8 @@ import javax.inject.Inject;
 
 import me.tiagomota.getflickred.R;
 import me.tiagomota.getflickred.ui.base.BaseActivity;
-import me.tiagomota.getflickred.ui.flickr.list.FlickrPhotosListFragment;
+import me.tiagomota.getflickred.ui.flickr.detail.FlickrPhotoDetailFragment;
+import me.tiagomota.getflickred.ui.flickr.list.FlickrPhotoListFragment;
 import me.tiagomota.getflickred.utils.NetworkUtils;
 import me.tiagomota.getflickred.utils.SnackBarFactory;
 import me.tiagomota.getflickred.utils.ViewUtils;
@@ -30,13 +33,15 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
 
     // General
     private CoordinatorLayout mCoordinatorLayout;
-    private AppBarLayout mAppBarLayout;
-    private CollapsingToolbarLayout mCollapsingToolbarLayout;
+    private Toolbar mToolbar;
 
     // Toolbar
     private TextInputLayout mUsernameInputLayout;
     private EditText mUsernameEditText;
     private TextView mProgressIndicator;
+
+    // User found callback
+    private OnUserFoundListener mOnUserFoundListener;
 
     @Override
     protected int getActivityLayout() {
@@ -47,10 +52,9 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
     protected void mapLayoutViews() {
         // General
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
-        mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar_layout);
-        mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_layout);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        // Toolbar
+        // Toolbar content
         mUsernameInputLayout = (TextInputLayout) findViewById(R.id.text_input_layout_username);
         mUsernameEditText = (EditText) findViewById(R.id.edit_text_username);
         mProgressIndicator = (TextView) findViewById(R.id.progress_indicator);
@@ -62,9 +66,10 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
         getActivityComponent().inject(this);
         mPresenter.attachView(this);
 
+        configureFragments();
+        configureToolbar();
         configureToolbarUsernameField();
     }
-
 
     @Override
     protected void onDestroy() {
@@ -73,30 +78,33 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
     }
 
     @Override
-    public void onUserFound(final String userId, final String username, final String realName) {
-        // add the list fragment to respective container
-        final FlickrPhotosListFragment fragment = FlickrPhotosListFragment.newInstance(userId);
-        final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(
-                isTablet() ? R.id.list_fragment_container : R.id.fragments_container,
-                fragment,
-                FlickrPhotosListFragment.TAG
-        );
-        ft.commit();
-        getSupportFragmentManager().executePendingTransactions();
+    public void onBackPressed() {
+        if (!isTablet() && getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStackImmediate();
 
-        // show progress indicator
-        mProgressIndicator.setText(getString(R.string.flickr_loading_user_public_photos));
-        mProgressIndicator.setVisibility(View.VISIBLE);
+            // update toolbar
+            configureToolbar();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onUserFound(final String userId, final String username, final String realName) {
+
+        if (mOnUserFoundListener != null && mOnUserFoundListener.onUserFound(userId)) {
+            // show progress indicator
+            mProgressIndicator.setText(getString(R.string.flickr_loading_user_public_photos));
+            mProgressIndicator.setVisibility(View.VISIBLE);
+        } else {
+            mProgressIndicator.setVisibility(View.GONE);
+        }
     }
 
     @Override
     public void onUserNotFound(final String message) {
         // hide progress indicator
         mProgressIndicator.setVisibility(View.GONE);
-
-        // hide content area
-        displayContentArea(false);
 
         SnackBarFactory.build(
                 mCoordinatorLayout,
@@ -131,12 +139,51 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
     public void onUserFirstPhotosPageLoaded() {
         // hide progress indicator
         mProgressIndicator.setVisibility(View.GONE);
-
-        // show content area.
-        displayContentArea(true);
     }
 
+    /**
+     * Handles the situation when the user has selected a photo from the list.
+     *
+     * @param photoEntry PhotoEntry
+     */
+    public void onPhotoSelected(final PhotoEntry photoEntry) {
+        final FlickrPhotoDetailFragment fragment = FlickrPhotoDetailFragment.newInstance(photoEntry);
+        final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
+        if (isTablet()) {
+            ft.replace(R.id.detail_fragment_container, fragment, FlickrPhotoDetailFragment.TAG);
+        } else {
+            ft.add(R.id.fragments_container, fragment, FlickrPhotoDetailFragment.TAG);
+            ft.addToBackStack(FlickrPhotoListFragment.TAG);
+        }
+
+        ft.commit();
+        getSupportFragmentManager().executePendingTransactions();
+
+        // configure toolbar to update it if necessary
+        configureToolbar();
+    }
+
+    /**
+     * Configures the Toolbar that is inside the AppBarLayout.
+     */
+    public void configureToolbar() {
+        if (!isTablet() && getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            mToolbar.setTitle(getString(R.string.toolbar_photo_detail_fragment_title));
+            mToolbar.setNavigationIcon(ContextCompat.getDrawable(this, R.drawable.ic_arrow_back_white_24dp));
+            mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View view) {
+                    onBackPressed();
+                }
+            });
+            mToolbar.setVisibility(View.VISIBLE);
+            mUsernameInputLayout.setVisibility(View.GONE);
+        } else {
+            mToolbar.setVisibility(View.GONE);
+            mUsernameInputLayout.setVisibility(View.VISIBLE);
+        }
+    }
 
 
     /**
@@ -156,6 +203,30 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
                 return true;
             }
         });
+    }
+
+    /**
+     * Adds the fragments necessary to populate the view.
+     */
+    private void configureFragments() {
+        // add the list fragment to respective container
+        final FlickrPhotoListFragment listFragment = new FlickrPhotoListFragment();
+        final FragmentTransaction listFT = getSupportFragmentManager().beginTransaction();
+        listFT.add(
+                isTablet() ? R.id.list_fragment_container : R.id.fragments_container,
+                listFragment,
+                FlickrPhotoListFragment.TAG
+        );
+        listFT.commit();
+        mOnUserFoundListener = listFragment;
+
+        // check if necessary to add the detail fragment
+        if (isTablet() && getSupportFragmentManager().getBackStackEntryCount() == 0) {
+            final FlickrPhotoDetailFragment detailFragment = FlickrPhotoDetailFragment.newInstance(null);
+            final FragmentTransaction detailFT = getSupportFragmentManager().beginTransaction();
+            detailFT.replace(R.id.detail_fragment_container, detailFragment, FlickrPhotoDetailFragment.TAG);
+            detailFT.commit();
+        }
     }
 
     /**
@@ -189,7 +260,6 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
         }
     }
 
-
     /**
      * Utility method that verifies if the current device is an Hanset or Tablet.
      *
@@ -199,26 +269,16 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
         return findViewById(R.id.fragments_container) == null;
     }
 
-    /**
-     * Utility method used to changes the Collapsing toolbar specs to show or hide the content area.
-     *
-     * @param show boolean
-     */
-    private void displayContentArea(final boolean show) {
-        // change appbar layout height
-        final CoordinatorLayout.LayoutParams clp = new CoordinatorLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                show ? ViewGroup.LayoutParams.WRAP_CONTENT : ViewGroup.LayoutParams.MATCH_PARENT
-        );
-        mAppBarLayout.setLayoutParams(clp);
 
-        // change collapsing toolbar layout scroll flags
-        final AppBarLayout.LayoutParams alp = (AppBarLayout.LayoutParams) mCollapsingToolbarLayout.getLayoutParams();
-        if (show) {
-            alp.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED);
-        } else {
-            alp.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
-        }
-        mCollapsingToolbarLayout.setLayoutParams(alp);
+    public interface OnUserFoundListener {
+
+        /**
+         * Callback to when the user is loaded. Needs to return true or false according if
+         * the loading o photos will happen or not.
+         *
+         * @param userId String
+         * @return boolean
+         */
+        boolean onUserFound(final String userId);
     }
 }

@@ -3,6 +3,6 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
-    <dimen name="flickr_list_fragment_width">300dp</dimen>
     <dimen name="flickr_list_item_photo_size">75dp</dimen>
+    <dimen name="text_between_lines_margin">8dp</dimen>
 </resources>

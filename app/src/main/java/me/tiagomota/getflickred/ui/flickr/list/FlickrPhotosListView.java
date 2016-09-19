@@ -3,6 +3,7 @@ package me.tiagomota.getflickred.ui.flickr.list;
 import java.util.List;
 
 import me.tiagomota.getflickred.ui.base.mvp.UiView;
+import me.tiagomota.getflickred.ui.flickr.PhotoEntry;
 
 interface FlickrPhotosListView extends UiView {
 

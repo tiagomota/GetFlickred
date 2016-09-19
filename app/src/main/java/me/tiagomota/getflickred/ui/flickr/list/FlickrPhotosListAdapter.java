@@ -13,19 +13,23 @@ import java.util.List;
 
 import me.tiagomota.getflickred.R;
 import me.tiagomota.getflickred.data.model.PhotoSize;
+import me.tiagomota.getflickred.ui.flickr.PhotoEntry;
 
 
 class FlickrPhotosListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final List<PhotoEntry> mPhotoEntries;
+    private final OnPhotoSelectedListener mOnPhotoSelectedListener;
 
-    FlickrPhotosListAdapter(final List<PhotoEntry> photos) {
+    FlickrPhotosListAdapter(final List<PhotoEntry> photos,
+                            final OnPhotoSelectedListener listener) {
         mPhotoEntries = photos;
+        mOnPhotoSelectedListener = listener;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
-        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_photos_item, parent, false);
+        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_photo_item, parent, false);
         return new PhotoViewHolder(view);
     }
 
@@ -54,6 +58,16 @@ class FlickrPhotosListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         } else {
             // TODO
         }
+
+        // set click listener
+        vh.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+                if (mOnPhotoSelectedListener != null) {
+                    mOnPhotoSelectedListener.onSelected(entry);
+                }
+            }
+        });
     }
 
     @Override
@@ -62,15 +76,20 @@ class FlickrPhotosListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
 
-    public void add(final PhotoEntry entry) {
-        mPhotoEntries.add(entry);
-        notifyItemInserted(getItemCount() - 1);
-    }
-
     public void addAll(final List<PhotoEntry> entries) {
         final int startInsertion = getItemCount();
         mPhotoEntries.addAll(entries);
         notifyItemRangeInserted(startInsertion, getItemCount());
+    }
+
+
+    interface OnPhotoSelectedListener {
+        /**
+         * Callback listener to when the user selects a Photo from the list.
+         *
+         * @param photoEntry PhotoEntry
+         */
+        void onSelected(final PhotoEntry photoEntry);
     }
 
 
