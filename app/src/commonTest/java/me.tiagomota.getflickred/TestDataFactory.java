@@ -35,8 +35,12 @@ public class TestDataFactory {
         return mGson.fromJson(DataHelper.USER, User.class);
     }
 
-    public PhotosList makePhotosList() {
-        return mGson.fromJson(DataHelper.PHOTOS_LIST, PhotosList.class);
+    public PhotosList makePhotosList(final int elems) {
+        PhotosList photosList = mGson.fromJson(DataHelper.PHOTOS_LIST, PhotosList.class);
+        for (int i = 0; i < elems; i++) {
+            photosList.getPhotos().add(TestDataFactory.get().makePhoto());
+        }
+        return photosList;
     }
 
     public Photo makePhoto() {

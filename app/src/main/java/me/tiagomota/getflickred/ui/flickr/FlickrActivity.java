@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -109,12 +110,14 @@ public class FlickrActivity extends BaseActivity implements FlickrView {
             final FlickrPhotoListFragment listFragment = (FlickrPhotoListFragment) getSupportFragmentManager()
                             .findFragmentByTag(FlickrPhotoListFragment.TAG);
 
+            Log.i("Test", user.getId());
             if (listFragment.onUserFound(user.getId())) {
                 showProgressIndicator(getString(R.string.flickr_loading_user_public_photos));
             } else {
                 showProgressIndicator(null);
             }
         } catch (final Exception ex) {
+            Log.i("Test", ex.getMessage());
             showProgressIndicator(null);
         }
     }

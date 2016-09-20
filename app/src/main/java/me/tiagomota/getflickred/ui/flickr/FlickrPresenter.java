@@ -1,5 +1,7 @@
 package me.tiagomota.getflickred.ui.flickr;
 
+import android.util.Log;
+
 import javax.inject.Inject;
 
 import me.tiagomota.getflickred.data.DataManager;

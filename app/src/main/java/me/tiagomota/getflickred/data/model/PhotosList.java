@@ -31,6 +31,10 @@ public class PhotosList extends Base {
         return mContent.mTotalPages;
     }
 
+    public void setTotalPages(final int totalPages) {
+        mContent.mTotalPages = totalPages;
+    }
+
     public int getTotalPhotos() {
         return mContent.mTotalPhotos;
     }

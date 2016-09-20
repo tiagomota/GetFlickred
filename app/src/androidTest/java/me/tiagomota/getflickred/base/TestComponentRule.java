@@ -1,4 +1,4 @@
-package me.tiagomota.getflickred;
+package me.tiagomota.getflickred.base;
 
 import android.content.Context;
 
@@ -6,6 +6,7 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
+import me.tiagomota.getflickred.GetFlickredApplication;
 import me.tiagomota.getflickred.data.DataManager;
 import me.tiagomota.getflickred.injection.component.DaggerTestComponent;
 import me.tiagomota.getflickred.injection.component.TestComponent;
