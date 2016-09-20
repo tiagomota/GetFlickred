@@ -106,7 +106,7 @@ class FlickrPhotosListPresenter extends BasePresenter<FlickrPhotosListView> {
                                     new Func2<PhotoInfo, PhotoSize, PhotoEntry>() {
                                         @Override
                                         public PhotoEntry call(final PhotoInfo photoInfo, final PhotoSize photoSize) {
-                                            return new PhotoEntry(photo, photoInfo, photoSize);  // merge the result in a UI obeject wrapper called PhotoEntry
+                                            return new PhotoEntry(photo, photoInfo, photoSize);  // merge the result in a UI object wrapper called PhotoEntry
                                         }
                                     });
                         }

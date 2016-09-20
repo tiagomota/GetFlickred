@@ -23,6 +23,7 @@ android {
 
     sourceSets {
         def commonTestDir = 'src/commonTest/java'
+
         test {
             java.srcDir commonTestDir
         }
