@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">GetFlickred</string>
+    <string name="dummy_content_description">Dummy Content Description</string>
 
     <string name="error_field_empty">Cannot be empty!</string>
     <string name="error_user_without_photos">User has no public photos!</string>
@@ -17,9 +18,8 @@
     <string name="flickr_list_item_uploaded_at">Posted at\u0020</string>
     <string name="flickr_list_item_taken_at">Taken at\u0020</string>
     <string name="flickr_list_item_loading_more_photos">Loading more photos…</string>
-    <string name="flickr_list_search_user_first">Search for a Flickr user and see the public photos</string>
+    <string name="flickr_list_search_user_first">Enter a Flickr Username and see it\'s photos</string>
 
-    <string name="flickr_detail_select_image_from_list">Choose a photo and see the details</string>
     <string name="flickr_detail_description">Description</string>
     <string name="flickr_detail_tags">\u0020 Tags</string>
     <string name="flickr_detail_comments">\u0020 Comments</string>

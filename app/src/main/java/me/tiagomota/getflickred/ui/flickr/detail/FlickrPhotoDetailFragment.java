@@ -1,23 +1,18 @@
 package me.tiagomota.getflickred.ui.flickr.detail;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.NestedScrollView;
 import android.text.Html;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import me.tiagomota.getflickred.BuildConfig;
 import me.tiagomota.getflickred.R;
 import me.tiagomota.getflickred.data.model.PhotoSize;
 import me.tiagomota.getflickred.ui.base.BaseFragment;
 import me.tiagomota.getflickred.ui.flickr.PhotoEntry;
-import me.tiagomota.getflickred.utils.ViewUtils;
 
 public class FlickrPhotoDetailFragment extends BaseFragment {
 
@@ -28,7 +23,6 @@ public class FlickrPhotoDetailFragment extends BaseFragment {
     private PhotoEntry mPhotoEntry;
 
     // Content Screen views
-    private NestedScrollView mContentContainer;
     private ImageView mPhotoView;
     private TextView mTitleView;
     private TextView mDescriptionView;
@@ -38,10 +32,6 @@ public class FlickrPhotoDetailFragment extends BaseFragment {
     private TextView mPostedDateView;
     private TextView mTakenDateView;
 
-    // Empty screen views
-    private RelativeLayout mEmptyContainer;
-    private ImageView mEmptyImageView;
-
     @Override
     protected int getFragmentLayout() {
         return R.layout.fragment_flickr_photo_detail;
@@ -50,7 +40,6 @@ public class FlickrPhotoDetailFragment extends BaseFragment {
     @Override
     protected void mapLayoutViews(final View root) {
         // Content screen
-        mContentContainer = (NestedScrollView) root.findViewById(R.id.content_container);
         mPhotoView = (ImageView) root.findViewById(R.id.image);
         mTitleView = (TextView) root.findViewById(R.id.title);
         mDescriptionView = (TextView) root.findViewById(R.id.description);
@@ -59,10 +48,6 @@ public class FlickrPhotoDetailFragment extends BaseFragment {
         mNrOfCommentView = (TextView) root.findViewById(R.id.comments);
         mPostedDateView = (TextView) root.findViewById(R.id.posted_date);
         mTakenDateView = (TextView) root.findViewById(R.id.taken_date);
-
-        // Empty screen
-        mEmptyContainer = (RelativeLayout) root.findViewById(R.id.empty_container);
-        mEmptyImageView = (ImageView) root.findViewById(R.id.empty_image);
     }
 
     @Override
@@ -76,11 +61,13 @@ public class FlickrPhotoDetailFragment extends BaseFragment {
             mPhotoEntry = getArguments().getParcelable(KEY_PHOTO_ENTRY);
         }
 
-        if (mPhotoEntry != null) {
-            configureContentScreen();
-        } else {
-            configureEmptyScreen();
-        }
+        configurePhotoView();
+        configureTitleView();
+        configureDescriptionView();
+        configureNrOfTagsView();
+        configureNrOfCommentsView();
+        configurePostedDateView();
+        configureTakenDateView();
     }
 
     @Override
@@ -106,32 +93,6 @@ public class FlickrPhotoDetailFragment extends BaseFragment {
         }
 
         return fragment;
-    }
-
-    /**
-     * Configures all the views of the content screen.
-     */
-    private void configureContentScreen() {
-        mContentContainer.setVisibility(View.VISIBLE);
-        mEmptyContainer.setVisibility(View.GONE);
-        configurePhotoView();
-        configureTitleView();
-        configureDescriptionView();
-        configureNrOfTagsView();
-        configureNrOfCommentsView();
-        configurePostedDateView();
-        configureTakenDateView();
-    }
-
-    /**
-     * Configures all views of the empty screen.
-     */
-    private void configureEmptyScreen() {
-        mContentContainer.setVisibility(View.GONE);
-        mEmptyContainer.setVisibility(View.VISIBLE);
-        mEmptyImageView.setImageDrawable(
-                ViewUtils.getTintedDrawable(getContext(), R.drawable.ic_image_black_48dp, R.color.textColorPrimary)
-        );
     }
 
     /**
