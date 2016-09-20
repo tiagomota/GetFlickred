@@ -7,7 +7,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-class Base implements Parcelable {
+public class Base implements Parcelable {
 
     private static final String SUCCESS = "ok";
 

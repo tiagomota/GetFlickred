@@ -123,7 +123,6 @@ class FlickrPhotosListPresenter extends BasePresenter<FlickrPhotosListView> {
                             new Action1<Throwable>() {
                                 @Override
                                 public void call(final Throwable throwable) {
-                                    Log.e("PhotosListPresenter", "Error loading photos", throwable);
                                     getView().handleErrorLoadingNewPhotosPage(throwable.getMessage());
                                 }
                             },
