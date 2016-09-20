@@ -4,7 +4,7 @@ package me.tiagomota.getflickred.data.remote;
 final class FlickrEndpoint {
 
     private static final String FLICKR_KEY = "&api_key=e09ce71c9f7dbbbf23df45f1e1eb144c";
-    private static final String FORMAT = "&format=me.tiagomota.getflickred.util.json&nojsoncallback=1";
+    private static final String FORMAT = "&format=json&nojsoncallback=1";
 
     // Find By Username
     static final String FIND_BY_USERNAME = "?method=flickr.people.findByUsername" + FLICKR_KEY + FORMAT;

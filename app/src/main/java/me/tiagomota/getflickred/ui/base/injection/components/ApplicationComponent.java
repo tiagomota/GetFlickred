@@ -5,10 +5,10 @@ import android.content.Context;
 import javax.inject.Singleton;
 
 import dagger.Component;
-import me.tiagomota.getflickred.ui.base.injection.qualifiers.ApplicationContext;
-import me.tiagomota.getflickred.ui.base.injection.modules.ApplicationModule;
 import me.tiagomota.getflickred.data.DataManager;
 import me.tiagomota.getflickred.data.injection.DataModule;
+import me.tiagomota.getflickred.ui.base.injection.modules.ApplicationModule;
+import me.tiagomota.getflickred.ui.base.injection.qualifiers.ApplicationContext;
 
 @Singleton
 @Component(modules = {
