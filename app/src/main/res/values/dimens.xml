@@ -1,0 +1,9 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="flickr_list_item_photo_size">75dp</dimen>
+    <dimen name="flickr_detail_photo_height">250dp</dimen>
+    <dimen name="text_between_lines_margin">8dp</dimen>
+</resources>
