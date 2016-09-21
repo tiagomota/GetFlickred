@@ -51,8 +51,6 @@ dependencies {
     final RUNNER_VERSION = '0.5'
     final DEXMAKER_VERSION = '1.4'
 
-
-
     // Google Support Library
     compile "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"                 // AppCompat
     compile "com.android.support:design:$SUPPORT_LIBRARY_VERSION"                       // Design

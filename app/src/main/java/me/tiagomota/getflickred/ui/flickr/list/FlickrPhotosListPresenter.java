@@ -1,7 +1,5 @@
 package me.tiagomota.getflickred.ui.flickr.list;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,8 +1,8 @@
 package me.tiagomota.getflickred;
 
-public final class DataHelper {
+final class DataHelper {
 
-    public static final String USER = "{\n" +
+    static final String USER = "{\n" +
             "  \"user\": {\n" +
             "    \"id\": \"113231763@N07\",\n" +
             "    \"nsid\": \"113231763@N07\",\n" +
@@ -14,7 +14,7 @@ public final class DataHelper {
             "}";
 
 
-    public static final String PHOTO = "{\n" +
+    static final String PHOTO = "{\n" +
             "  \"id\": \"29103697453\",\n" +
             "  \"owner\": \"113231763@N07\",\n" +
             "  \"secret\": \"ca811d0e07\",\n" +
@@ -27,7 +27,7 @@ public final class DataHelper {
             "}";
 
 
-    public static final String PHOTO_INFO = "{\n" +
+    static final String PHOTO_INFO = "{\n" +
             "  \"photo\": {\n" +
             "    \"id\": \"29103697453\",\n" +
             "    \"secret\": \"ca811d0e07\",\n" +
@@ -334,7 +334,7 @@ public final class DataHelper {
             "  \"stat\": \"ok\"\n" +
             "}";
 
-    public static final String PHOTO_SIZE = "{\n" +
+    static final String PHOTO_SIZE = "{\n" +
             "  \"sizes\": {\n" +
             "    \"canblog\": 0,\n" +
             "    \"canprint\": 0,\n" +
@@ -442,13 +442,14 @@ public final class DataHelper {
             "}";
 
 
-    public static final String PHOTOS_LIST = "{\n" +
+    static final String PHOTOS_LIST = "{\n" +
             "  \"photos\": {\n" +
             "    \"page\": 1,\n" +
             "    \"pages\": 60,\n" +
             "    \"perpage\": 7,\n" +
             "    \"total\": \"415\",\n" +
             "    \"photo\": [\n" +
+            "    ]\n" +
             "  },\n" +
             "  \"stat\": \"ok\"\n" +
             "}";
