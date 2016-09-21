@@ -5,6 +5,8 @@ This is a simple android app that allows one to search for a Flickr username an 
 ## Usage
 
 Just import the project to the latest Android Studio version and run it.
+**Note:** A user with cool pictures is "_Jerry Fryer_", have a look!
+
 Regarding tests, this project has some. 
 
 - UI Tests
